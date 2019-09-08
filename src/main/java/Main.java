@@ -7,6 +7,8 @@ public class Main {
     public static void main(String[] args){
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
+        StudentsController.selectStudent();
+
         closeDatabase();
     }
     private static void openDatabase(String dbFile) {
