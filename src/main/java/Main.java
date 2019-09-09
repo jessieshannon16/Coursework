@@ -1,5 +1,5 @@
 import org.sqlite.SQLiteConfig;
-
+import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 public class Main {
@@ -8,7 +8,7 @@ public class Main {
     public static void main(String[] args){
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
-        StudentsController.selectStudent();
+        StudentsDB.selectStudent();
 
         closeDatabase();
     }
