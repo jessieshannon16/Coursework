@@ -6,14 +6,15 @@ import java.sql.SQLException;
     public class StudentsDB {
         public static void selectStudent() {
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students");
+                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students ");
                 // test pull works
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
-                    String StudentName = results.getString(1);
-                    String StudentUsername = results.getString(2);
+                    String StudentUsername = results.getString(1);
+                    String StudentName = results.getString(2);
                     String Password = results.getString(3);
                     String AdultUsername = results.getString(4);
+System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + ", Password: " + Password + ", Parent/ Teachers Username: " + AdultUsername);
                 }
             } catch (SQLException exception) {
                 System.out.println(exception.getMessage());
@@ -23,7 +24,7 @@ import java.sql.SQLException;
 
         public static void insertStudent(String StudentName, String StudentUsername, String Password, String AdultUsername) {
             try {
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");
+                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername, level) VALUES (?,?,?,?,0)");
                 ps.setString(1, StudentName);
                 ps.setString(2, StudentUsername);
                 ps.setString(3, Password);

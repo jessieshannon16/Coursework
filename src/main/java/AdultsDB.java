@@ -13,19 +13,19 @@ public class AdultsDB {
                 String AdultName = results.getString(2);
                 String Password = results.getString(3);
                 int NoOfStudents = results.getInt(4);
+                System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
             }
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
             System.out.println("Error. Something has gone wrong");
         }
     }
-    public static void insertAdult(String AdultUsername, String AdultName, String Password, int NoOfStudents) {
+    public static void insertAdult(String AdultUsername, String AdultName, String Password) {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Adults (AdultUsername, AdultName, Password, NoOfStudents) VALUES (?,?,?,?)");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Adults (AdultUsername, AdultName, Password) VALUES (?,?,?)");
             ps.setString(1, AdultUsername);
             ps.setString(2, AdultName);
             ps.setString(3, Password);
-            ps.setInt(4, NoOfStudents);
             ps.executeUpdate();
             System.out.println("Adults account added successfully");
         } catch (SQLException exception) {
