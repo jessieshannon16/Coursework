@@ -1,5 +1,5 @@
 import org.sqlite.SQLiteConfig;
-import java.sql.*;
+//import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 public class Main {
@@ -9,6 +9,10 @@ public class Main {
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
         StudentsDB.selectStudent();
+        AdultsDB.selectAdult();
+        CoursesDB.selectCourse();
+        QuestionsDB.selectQuestion();
+        StudentCoursesDB.selectStudentCourse();
 
         closeDatabase();
     }
@@ -16,7 +20,7 @@ public class Main {
 
 
         try {
-            Class.forName("ord.sqlite.JDBC");
+            Class.forName("org.sqlite.JDBC");
             SQLiteConfig config = new SQLiteConfig();
             config.enforceForeignKeys(true);
             db = DriverManager.getConnection("jdbc:sqlite:resources/" + dbFile, config.toProperties());
