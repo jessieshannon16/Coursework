@@ -4,23 +4,29 @@ import java.sql.SQLException;
 
 
     public class StudentsDB {
-        public static void selectStudent() {
+        public static String selectStudent(String Username) {
+            String Password = null;
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students ");
+                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students WHERE StudentUsername = ?");
                 // test pull works
+                ps.setString(1, Username);
                 ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    String StudentUsername = results.getString(1);
-                    String StudentName = results.getString(2);
-                    String Password = results.getString(3);
-                    String AdultUsername = results.getString(4);
-System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + ", Password: " + Password + ", Parent/ Teachers Username: " + AdultUsername);
-                }
+                //while (results.next()) {
+                String StudentUsername = results.getString(1);
+                String StudentName = results.getString(2);
+                Password = results.getString(3);
+                String AdultUsername = results.getString(4);
+//System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + ", Password: " + Password + ", Parent/Teachers Username: " + AdultUsername);
+                //}
+
             } catch (SQLException exception) {
                 System.out.println(exception.getMessage());
                 System.out.println("Error. Something has gone wrong");
             }
+            return Password;
         }
+
+
 
         public static void insertStudent(String StudentName, String StudentUsername, String Password, String AdultUsername) {
             try {

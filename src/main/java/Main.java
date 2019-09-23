@@ -10,9 +10,18 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
-        //register();
-        StudentsDB.selectStudent();
-        AdultsDB.selectAdult();
+
+        System.out.println("Enter the corresponding number:");
+        System.out.println("1. Register");
+        System.out.println("2. Log in");
+        int number = sc.nextInt();
+        if (number == 1){
+            register();
+        }else if (number == 2){
+            logon();
+        }
+
+
         CoursesDB.selectCourse();
         QuestionsDB.selectQuestion();
         StudentCoursesDB.selectStudentCourse();
@@ -47,7 +56,28 @@ private static void closeDatabase() {
 
 }
     public static void logon(){
+        Scanner sc = new Scanner(System.in);
 
+        System.out.println("Please enter your username");
+        String username = sc.nextLine();
+        System.out.println("Please enter you password");
+        String password = sc.nextLine();
+        System.out.println("Adult or student account?"); //will be controlled with tick boxes on the GUI
+        String decision = sc.nextLine();
+String verification = "";
+        if (decision.equals("adult")){
+             verification = AdultsDB.selectAdult(username);
+        }else if (decision.equals("student")){
+             verification = StudentsDB.selectStudent(username);
+        }else{
+            System.out.println("Error");
+
+        }
+if (password.equals(verification)){
+    System.out.println("Access granted");
+}else{
+    System.out.println("Access denied");
+}
     }
     public static void register(){
         Scanner sc = new Scanner(System.in);
@@ -58,18 +88,18 @@ private static void closeDatabase() {
         String password = sc.nextLine();
         System.out.println("Please enter your full name");
         String name = sc.nextLine();
-        System.out.println("Do you want to make and adult or student account?");
+        System.out.println("Do you want to make an adult or student account?");
         String decision = sc.nextLine();
         if (decision.equals("adult")){
             AdultsDB.insertAdult(username,name,password);
-            AdultsDB.selectAdult();
+            //AdultsDB.selectAdult();
         }else if (decision.equals("student")){
             System.out.println("Please enter your teachers/ parents username");
             String adultUsername = sc.nextLine();
             StudentsDB.insertStudent(name,username,password,adultUsername);
-            StudentsDB.selectStudent();
+            //StudentsDB.selectStudent();
         }else{
-            System.out.println("Error");
+            System.out.println("Error with entering in student/adult");
         }
 
 

@@ -3,22 +3,27 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AdultsDB {
-    public static void selectAdult(){
+    public static String selectAdult(String Username) {
+        String Password = null;
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults WHERE AdultUsername = ?");
             // test pull works
+            ps.setString(1, Username);
             ResultSet results = ps.executeQuery();
+            Password = null;
             while (results.next()) {
                 String AdultUsername = results.getString(1);
                 String AdultName = results.getString(2);
-                String Password = results.getString(3);
+                Password = results.getString(3);
                 int NoOfStudents = results.getInt(4);
-                System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
+                //System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
             }
+
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
             System.out.println("Error. Something has gone wrong");
         }
+        return Password;
     }
     public static void insertAdult(String AdultUsername, String AdultName, String Password) {
         try {
