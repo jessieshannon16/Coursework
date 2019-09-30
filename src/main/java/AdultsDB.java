@@ -7,7 +7,7 @@ public class AdultsDB {
         String Password = null;
         try {
             PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults WHERE AdultUsername = ?");
-            // test pull works
+
             ps.setString(1, Username);
             ResultSet results = ps.executeQuery();
             Password = null;
@@ -53,7 +53,7 @@ public class AdultsDB {
             System.out.println("Error. Something has gone wrong");
         }
     }
-    public static void deleteStudent(String AdultUsername){
+    public static void deleteAdult(String AdultUsername){
         try{
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Adults WHERE AdultUsername = ?");
             ps.setString(1, AdultUsername);

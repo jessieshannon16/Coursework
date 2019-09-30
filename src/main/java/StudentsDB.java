@@ -4,26 +4,28 @@ import java.sql.SQLException;
 
 
     public class StudentsDB {
-        public static String selectStudent(String Username) {
-            String Password = null;
+        public static void selectStudent(//String Username
+                                            ) {
+           // String Password = null;
             try {
-                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students WHERE StudentUsername = ?");
+                PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students ");
+                //WHERE StudentUsername = ?
                 // test pull works
-                ps.setString(1, Username);
+                //ps.setString(1, Username);
                 ResultSet results = ps.executeQuery();
-                //while (results.next()) {
+                while (results.next()) {
                 String StudentUsername = results.getString(1);
                 String StudentName = results.getString(2);
-                Password = results.getString(3);
+                String Password = results.getString(3);
                 String AdultUsername = results.getString(4);
-//System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + ", Password: " + Password + ", Parent/Teachers Username: " + AdultUsername);
-                //}
+System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + ", Password: " + Password + ", Parent/Teachers Username: " + AdultUsername);
+                }
 
             } catch (SQLException exception) {
                 System.out.println(exception.getMessage());
                 System.out.println("Error. Something has gone wrong");
             }
-            return Password;
+           // return Password;
         }
 
 
