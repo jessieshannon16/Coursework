@@ -10,39 +10,21 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
-        System.out.println("Please enter what username you would like");
-        String username = sc.nextLine();
-        System.out.println("Please enter your password");
-        String password = sc.nextLine();
-        System.out.println("Please enter your full name");
-        String name = sc.nextLine();
-        System.out.println("Do you want to make an adult or student account?");
-        String decision = sc.nextLine();
-        if (decision.equals("adult")){
-            AdultsDB.insertAdult(username,name,password);
-            //AdultsDB.selectAdult();
-        }else if (decision.equals("student")){
-            System.out.println("Please enter your teachers/ parents username");
-            String adultUsername = sc.nextLine();
-            StudentsDB.insertStudent(name,username,password,adultUsername);
-            //StudentsDB.selectStudent();
-        }else{
-            System.out.println("Error with entering in student/adult");
-        }
+
 //StudentsDB.insertStudent();
 //StudentsDB.selectStudent();
 //StudentsDB.deleteStudent("J3ss13sh1");
-        //System.out.println("What is the username of the record you would like to change?");
-        //String username = sc.nextLine();
-        //System.out.println("What username would you like to change it to?");
-        //String newusername = sc.nextLine();
-       // System.out.println("What password would you like to change to?");
-        //String password =  sc.nextLine();
-        //System.out.println("What adult username would you like to connect to?");
-        //String adultusername = sc.nextLine();
-        //System.out.println("What full name would you like to change to?");
-        //String fullname = sc.nextLine();
-//StudentsDB.updateStudent(fullname, newusername, password, adultusername, username);
+        System.out.println("What is the username of the record you would like to change?");
+        String username = sc.nextLine();
+        System.out.println("What username would you like to change it to?");
+        String newusername = sc.nextLine();
+       System.out.println("What password would you like to change to?");
+       String password =  sc.nextLine();
+       System.out.println("What adult username would you like to connect to?");
+       String adultusername = sc.nextLine();
+       System.out.println("What full name would you like to change to?");
+       String fullname = sc.nextLine();
+StudentsDB.updateStudent(fullname, newusername, password, adultusername, username);
         //System.out.println("Enter the corresponding number:");
         //System.out.println("1. Register");
         //System.out.println("2. Log in");
