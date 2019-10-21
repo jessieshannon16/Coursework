@@ -6,11 +6,11 @@ import java.sql.SQLException;
     public class StudentsDB {
         public static void selectStudent(//String Username
                                             ) {
-           // String Password = null;
+          //String Password = null;
             try {
                 PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students ");
                 //WHERE StudentUsername = ?
-                // test pull works
+                //test pull works
                 //ps.setString(1, Username);
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
@@ -42,6 +42,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
             } catch (SQLException exception) {
                 System.out.println(exception.getMessage());
                 System.out.println("Error. Something has gone wrong");
+                System.out.println();
             }
 
         }
