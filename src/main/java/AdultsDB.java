@@ -3,18 +3,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AdultsDB {
-    public static String selectAdult(String Username) {
-        String Password = null;
+    public static void selectAdult() {
+       // String Password = null;
         try {
             PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults WHERE AdultUsername = ?");
 
-            ps.setString(1, Username);
+           // ps.setString(1, Username);
             ResultSet results = ps.executeQuery();
-            Password = null;
+           // Password = null;
             while (results.next()) {
                 String AdultUsername = results.getString(1);
                 String AdultName = results.getString(2);
-                Password = results.getString(3);
+                String Password = results.getString(3);
                 int NoOfStudents = results.getInt(4);
                 //System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
             }
@@ -23,7 +23,7 @@ public class AdultsDB {
             System.out.println(exception.getMessage());
             System.out.println("Error. Something has gone wrong");
         }
-        return Password;
+       // return Password;
     }
     public static void insertAdult(String AdultUsername, String AdultName, String Password) {
         try {

@@ -14,7 +14,7 @@ public class Main {
 //StudentsDB.insertStudent();
 //StudentsDB.selectStudent();
 //StudentsDB.deleteStudent("J3ss13sh1");
-        System.out.println("What is the username of the record you would like to change?");
+      /*  System.out.println("What is the username of the record you would like to change?");
         String username = sc.nextLine();
         System.out.println("What username would you like to change it to?");
         String newusername = sc.nextLine();
@@ -24,21 +24,21 @@ public class Main {
        String adultusername = sc.nextLine();
        System.out.println("What full name would you like to change to?");
        String fullname = sc.nextLine();
-StudentsDB.updateStudent(fullname, newusername, password, adultusername, username);
+StudentsDB.updateStudent(fullname, newusername, password, adultusername, username); */
         //System.out.println("Enter the corresponding number:");
         //System.out.println("1. Register");
         //System.out.println("2. Log in");
        // int number = sc.nextInt();
        // if (number == 1){
-          //  register();
+          // register();
         //}else if (number == 2){
            // logon();
        // }
 
-
-        CoursesDB.selectCourse();
-        QuestionsDB.selectQuestion();
-        StudentCoursesDB.selectStudentCourse();
+AdultsDB.selectAdult();
+       // CoursesDB.selectCourse();
+       // QuestionsDB.selectQuestion();
+       // StudentCoursesDB.selectStudentCourse();
 
         closeDatabase();
     }
@@ -117,7 +117,7 @@ private static void closeDatabase() {
         String decision = sc.nextLine();
         String verification = "";
         if (decision.equals("adult")){
-             verification = AdultsDB.selectAdult(username);
+            // verification = AdultsDB.selectAdult(username);
         }else if (decision.equals("student")){
              //verification = StudentsDB.selectStudent(username);
         }else{
