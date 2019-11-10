@@ -20,12 +20,11 @@ public class StudentCoursesDB {
         }
     }
 
-    public static void insertStudentCourse(String StudentUsername, int CourseID, String LastDate) {
+    public static void insertStudentCourse(String StudentUsername, int CourseID) {
         try {
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO StudentCourses (StudentUsername, CourseID, LastDate) VALUES (?,?,?)");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO StudentCourses (StudentUsername, CourseID) VALUES (?,?)");
             ps.setString(1, StudentUsername);
             ps.setInt(2, CourseID);
-            ps.setString(3, LastDate);
             ps.executeUpdate();
             System.out.println("Student course added successfully");
         } catch (SQLException exception) {

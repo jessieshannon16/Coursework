@@ -2,6 +2,7 @@ import org.sqlite.SQLiteConfig;
 //import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLOutput;
 import java.util.Scanner;
 public class Main {
     public static Connection db = null;
@@ -14,17 +15,18 @@ public class Main {
 //StudentsDB.insertStudent();
 //StudentsDB.selectStudent();
 //StudentsDB.deleteStudent("J3ss13sh1");
-      /*  System.out.println("What is the username of the record you would like to change?");
+       /* System.out.println("What is the username of the record you would like to change?");
         String username = sc.nextLine();
         System.out.println("What username would you like to change it to?");
         String newusername = sc.nextLine();
        System.out.println("What password would you like to change to?");
        String password =  sc.nextLine();
-       System.out.println("What adult username would you like to connect to?");
-       String adultusername = sc.nextLine();
+      // System.out.println("What adult username would you like to connect to?");
+      // String adultusername = sc.nextLine();
        System.out.println("What full name would you like to change to?");
        String fullname = sc.nextLine();
-StudentsDB.updateStudent(fullname, newusername, password, adultusername, username); */
+       int no = 0;
+AdultsDB.updateAdults(newusername, fullname, password, no, username);*/
         //System.out.println("Enter the corresponding number:");
         //System.out.println("1. Register");
         //System.out.println("2. Log in");
@@ -34,8 +36,31 @@ StudentsDB.updateStudent(fullname, newusername, password, adultusername, usernam
         //}else if (number == 2){
            // logon();
        // }
-
-AdultsDB.selectAdult();
+        /*System.out.println("What is the username of the record you would like to change?");
+        String username = sc.nextLine();
+AdultsDB.deleteAdult(username);
+//AdultsDB.selectAdult();*/
+        System.out.println("What is the QuestionID of the record you want to change?");
+        int questionID = sc.nextInt();
+       /* System.out.println("What is the new question ID?");
+        int questionIDupdated = sc.nextInt();
+        System.out.println("What is the new course ID?");
+        int courseID = sc.nextInt();
+        System.out.println("What is the new question?");
+        String question = sc.next();
+        System.out.println("What is the new correct answer?");
+        String correctAnswer = sc.next();
+        System.out.println("What are the new incorrect answers?");
+        String incorrectAnswer1 = sc.next();
+        String incorrectAnswer2 = sc.next();
+        String incorrectAnswer3 = sc.next();
+QuestionsDB.updateQuestion(questionIDupdated, courseID, question, correctAnswer,incorrectAnswer1, incorrectAnswer2, incorrectAnswer3, questionID);*/
+       /* System.out.println("What is the new course name?");
+        String courseName = sc.next();
+        System.out.println("What is the new course ID?");
+        int newCourseID = sc.nextInt();*/
+QuestionsDB.deleteQuestion(questionID);
+        //CoursesDB.deleteCourse(courseID);
        // CoursesDB.selectCourse();
        // QuestionsDB.selectQuestion();
        // StudentCoursesDB.selectStudentCourse();

@@ -6,7 +6,7 @@ public class AdultsDB {
     public static void selectAdult() {
        // String Password = null;
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults WHERE AdultUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password, NoOfStudents FROM Adults ");
 
            // ps.setString(1, Username);
             ResultSet results = ps.executeQuery();
@@ -16,7 +16,7 @@ public class AdultsDB {
                 String AdultName = results.getString(2);
                 String Password = results.getString(3);
                 int NoOfStudents = results.getInt(4);
-                //System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
+                System.out.println("Username: " + AdultUsername + ", Name: " + AdultName + ", Password: " + Password + ", Number of Students: " + NoOfStudents);
             }
 
         } catch (SQLException exception) {

@@ -16,7 +16,7 @@ public class QuestionsDB {
                 String IncorrectAnswer1 = results.getString(5);
                 String IncorrectAnswer2 = results.getString(6);
                 String IncorrectAnswer3 = results.getString(7);
-                System.out.println("Question: " + Question + ", Correct Answer: " + CorrectAnswer + ", Incorrect Answer 1: " + IncorrectAnswer1 + ", Incorrect Answer 2: " + IncorrectAnswer2 + ", Incorrect answer 3: " + IncorrectAnswer3);
+                System.out.println("Question ID: " + QuestionID + ", Course ID: " + CourseID + ", Question: " + Question + ", Correct Answer: " + CorrectAnswer + ", Incorrect Answer 1: " + IncorrectAnswer1 + ", Incorrect Answer 2: " + IncorrectAnswer2 + ", Incorrect answer 3: " + IncorrectAnswer3);
             }
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());

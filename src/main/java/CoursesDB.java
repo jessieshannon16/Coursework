@@ -11,6 +11,7 @@ public class CoursesDB {
             while (results.next()) {
                 int CourseID = results.getInt(1);
                 String CourseName = results.getString(2);
+                System.out.println("Course ID: " + CourseID + ", Course name: " + CourseName);
             }
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
