@@ -26,7 +26,7 @@ public class Main {
        System.out.println("What full name would you like to change to?");
        String fullname = sc.nextLine();
        int no = 0;
-AdultsDB.updateAdults(newusername, fullname, password, no, username);*/
+AdultsDB.updateAdults(newusername, fullname, password, no, username); */
         //System.out.println("Enter the corresponding number:");
         //System.out.println("1. Register");
         //System.out.println("2. Log in");
@@ -40,8 +40,16 @@ AdultsDB.updateAdults(newusername, fullname, password, no, username);*/
         String username = sc.nextLine();
 AdultsDB.deleteAdult(username);
 //AdultsDB.selectAdult();*/
-        System.out.println("What is the QuestionID of the record you want to change?");
-        int questionID = sc.nextInt();
+       /* System.out.println("Please enter the current username");
+        String username = sc.nextLine();*/
+       /* System.out.println("Please enter the new username");
+        String newusername = sc.nextLine();
+        System.out.println("What is the new course ID?");
+        int courseID = sc.nextInt();
+        StudentCoursesDB.updateStudentCourse(newusername, courseID, username);*/
+//StudentCoursesDB.deleteStudentCourse(username);
+        //System.out.println("What is the QuestionID of the record you want to change?");
+        //int questionID = sc.nextInt();
        /* System.out.println("What is the new question ID?");
         int questionIDupdated = sc.nextInt();
         System.out.println("What is the new course ID?");
@@ -59,11 +67,41 @@ QuestionsDB.updateQuestion(questionIDupdated, courseID, question, correctAnswer,
         String courseName = sc.next();
         System.out.println("What is the new course ID?");
         int newCourseID = sc.nextInt();*/
-QuestionsDB.deleteQuestion(questionID);
+//QuestionsDB.deleteQuestion(questionID);
         //CoursesDB.deleteCourse(courseID);
        // CoursesDB.selectCourse();
        // QuestionsDB.selectQuestion();
-       // StudentCoursesDB.selectStudentCourse();
+        //StudentCoursesDB.selectStudentCourse();
+
+        /*System.out.println("What is the current username?");
+        String username = sc.nextLine();
+        System.out.println("What is the new username?");
+        String newusername = sc.nextLine();
+        System.out.println("What is the new avatar colour?");
+        String colour = sc.nextLine();
+        System.out.println("Whats is the new avatar image?");
+        String image = sc.nextLine();
+        System.out.println("What is the new hungry image?");
+        String image1 = sc.nextLine();
+        System.out.println("What is the new dirty image?");
+        String image2 = sc.nextLine();
+        System.out.println("What is the new confused image?");
+        String image3 = sc.nextLine();
+        System.out.println("What is the new hungry and dirty image?");
+        String image4 = sc.nextLine();
+        System.out.println("What is the new hungry and confused image?");
+        String image5 = sc.nextLine();
+        System.out.println("What is the new dirty and confused image?");
+        String image6 = sc.nextLine();
+        System.out.println("What is the new hungry, dirty and confused image?");
+        String image7 = sc.nextLine();
+
+        AvatarDB.updateAvatar(newusername, colour, image, image1, image2, image3, image4, image5, image6, image7, username);*/
+        //AvatarDB.selectAvatar();
+
+        System.out.println("What is the username?");
+        String username = sc.nextLine();
+        AvatarDB.deleteAvatar(username);
 
         closeDatabase();
     }

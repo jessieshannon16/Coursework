@@ -12,7 +12,7 @@ public class StudentCoursesDB {
                 String StudentUsername = results.getString(1);
                 int CourseID = results.getInt(2);
                 String LastDate = results.getString(3);
-
+System.out.println("Student username: " + StudentUsername + ", Course ID: " + CourseID + ", Last date: " + LastDate );
             }
         } catch (SQLException exception) {
             System.out.println(exception.getMessage());
@@ -33,13 +33,12 @@ public class StudentCoursesDB {
         }
 
     }
-    public static void updateStudentCourse(String StudentUsernameUpdated, int CourseID, String LastDate, String StudentUsername){
+    public static void updateStudentCourse(String StudentUsernameUpdated, int CourseID, String StudentUsername){
         try{
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE StudentCourses SET StudentUsername = ?, CourseID = ?, LastDate = ? WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE StudentCourses SET StudentUsername = ?, CourseID = ? WHERE StudentUsername = ?");
             ps.setString(1, StudentUsernameUpdated);
             ps.setInt(2, CourseID);
-            ps.setString(3, LastDate);
-            ps.setString(4, StudentUsername);
+            ps.setString(3, StudentUsername);
             ps.executeUpdate();
         }catch (Exception exception){
             System.out.println(exception.getMessage());
