@@ -1,8 +1,18 @@
+package Server;
+
+import Controllers.AdultsDB;
+import Controllers.AvatarDB;
+import Controllers.StudentsDB;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.sqlite.SQLiteConfig;
 //import java.sql.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.SQLOutput;
 import java.util.Scanner;
 public class Main {
     public static Connection db = null;
@@ -12,9 +22,9 @@ public class Main {
         openDatabase("Coursework database.db");
         //code to get data from, write to the database etc goes here
 
-//StudentsDB.insertStudent();
-//StudentsDB.selectStudent();
-//StudentsDB.deleteStudent("J3ss13sh1");
+//Controllers.StudentsDB.insertStudent();
+//Controllers.StudentsDB.selectStudent();
+//Controllers.StudentsDB.deleteStudent("J3ss13sh1");
        /* System.out.println("What is the username of the record you would like to change?");
         String username = sc.nextLine();
         System.out.println("What username would you like to change it to?");
@@ -26,7 +36,7 @@ public class Main {
        System.out.println("What full name would you like to change to?");
        String fullname = sc.nextLine();
        int no = 0;
-AdultsDB.updateAdults(newusername, fullname, password, no, username); */
+Controllers.AdultsDB.updateAdults(newusername, fullname, password, no, username); */
         //System.out.println("Enter the corresponding number:");
         //System.out.println("1. Register");
         //System.out.println("2. Log in");
@@ -38,16 +48,16 @@ AdultsDB.updateAdults(newusername, fullname, password, no, username); */
        // }
         /*System.out.println("What is the username of the record you would like to change?");
         String username = sc.nextLine();
-AdultsDB.deleteAdult(username);
-//AdultsDB.selectAdult();*/
+Controllers.AdultsDB.deleteAdult(username);
+//Controllers.AdultsDB.selectAdult();*/
        /* System.out.println("Please enter the current username");
         String username = sc.nextLine();*/
        /* System.out.println("Please enter the new username");
         String newusername = sc.nextLine();
         System.out.println("What is the new course ID?");
         int courseID = sc.nextInt();
-        StudentCoursesDB.updateStudentCourse(newusername, courseID, username);*/
-//StudentCoursesDB.deleteStudentCourse(username);
+        Controllers.StudentCoursesDB.updateStudentCourse(newusername, courseID, username);*/
+//Controllers.StudentCoursesDB.deleteStudentCourse(username);
         //System.out.println("What is the QuestionID of the record you want to change?");
         //int questionID = sc.nextInt();
        /* System.out.println("What is the new question ID?");
@@ -62,16 +72,16 @@ AdultsDB.deleteAdult(username);
         String incorrectAnswer1 = sc.next();
         String incorrectAnswer2 = sc.next();
         String incorrectAnswer3 = sc.next();
-QuestionsDB.updateQuestion(questionIDupdated, courseID, question, correctAnswer,incorrectAnswer1, incorrectAnswer2, incorrectAnswer3, questionID);*/
+Controllers.QuestionsDB.updateQuestion(questionIDupdated, courseID, question, correctAnswer,incorrectAnswer1, incorrectAnswer2, incorrectAnswer3, questionID);*/
        /* System.out.println("What is the new course name?");
         String courseName = sc.next();
         System.out.println("What is the new course ID?");
         int newCourseID = sc.nextInt();*/
-//QuestionsDB.deleteQuestion(questionID);
-        //CoursesDB.deleteCourse(courseID);
-       // CoursesDB.selectCourse();
-       // QuestionsDB.selectQuestion();
-        //StudentCoursesDB.selectStudentCourse();
+//Controllers.QuestionsDB.deleteQuestion(questionID);
+        //Controllers.CoursesDB.deleteCourse(courseID);
+       // Controllers.CoursesDB.selectCourse();
+       // Controllers.QuestionsDB.selectQuestion();
+        //Controllers.StudentCoursesDB.selectStudentCourse();
 
         /*System.out.println("What is the current username?");
         String username = sc.nextLine();
@@ -96,12 +106,28 @@ QuestionsDB.updateQuestion(questionIDupdated, courseID, question, correctAnswer,
         System.out.println("What is the new hungry, dirty and confused image?");
         String image7 = sc.nextLine();
 
-        AvatarDB.updateAvatar(newusername, colour, image, image1, image2, image3, image4, image5, image6, image7, username);*/
-        //AvatarDB.selectAvatar();
+        Controllers.AvatarDB.updateAvatar(newusername, colour, image, image1, image2, image3, image4, image5, image6, image7, username);*/
+        //Controllers.AvatarDB.selectAvatar();
 
-        System.out.println("What is the username?");
+       /* System.out.println("What is the username?");
         String username = sc.nextLine();
-        AvatarDB.deleteAvatar(username);
+        AvatarDB.deleteAvatar(username);*/
+        ResourceConfig config = new ResourceConfig();
+        config.packages("Controllers");
+        config.register(MultiPartFeature.class);
+        ServletHolder servlet = new ServletHolder(new ServletContainer(config));
+
+        Server server = new Server(8081);
+        ServletContextHandler context = new ServletContextHandler(server, "/");
+        context.addServlet(servlet, "/*");
+
+        try {
+            server.start();
+            System.out.println("Server successfully started.");
+            server.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         closeDatabase();
     }
@@ -180,9 +206,9 @@ private static void closeDatabase() {
         String decision = sc.nextLine();
         String verification = "";
         if (decision.equals("adult")){
-            // verification = AdultsDB.selectAdult(username);
+            // verification = Controllers.AdultsDB.selectAdult(username);
         }else if (decision.equals("student")){
-             //verification = StudentsDB.selectStudent(username);
+             //verification = Controllers.StudentsDB.selectStudent(username);
         }else{
             System.out.println("Error");
 
@@ -207,12 +233,12 @@ private static void closeDatabase() {
         String decision = sc.nextLine();
         if (decision.equals("adult")){
             AdultsDB.insertAdult(username,name,password);
-            //AdultsDB.selectAdult();
+            //Controllers.AdultsDB.selectAdult();
         }else if (decision.equals("student")){
             System.out.println("Please enter your teachers/ parents username");
             String adultUsername = sc.nextLine();
             StudentsDB.insertStudent(name,username,password,adultUsername);
-            //StudentsDB.selectStudent();
+            //Controllers.StudentsDB.selectStudent();
         }else{
             System.out.println("Error with entering in student/adult");
         }
