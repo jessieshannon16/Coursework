@@ -2,12 +2,11 @@ package Controllers;
 
 import Server.Main;
 import jdk.nashorn.internal.objects.annotations.Getter;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.awt.*;
 import java.sql.PreparedStatement;
@@ -16,10 +15,10 @@ import java.sql.SQLException;
 @Path("courses/")
 public class CoursesDB {
     @GET
-    @Path("list/")
+    @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
 
-    public static String selectCourse(){
+    public String selectCourse(){
         System.out.println("courses/list/");
         JSONArray list = new JSONArray();
         try {
@@ -43,40 +42,70 @@ public class CoursesDB {
            // System.out.println("Error. Something has gone wrong");
         }
     }
-    public static void insertCourse(int CourseID, String CourseName) {
+    @POST
+    @Path("insert")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String insertCourse(@FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName) {
         try {
+            if (CourseID == null || CourseName == null) {
+            throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            System.out.println("courses/insert CourseID=" + CourseID + "courses/insert CourseName=" + CourseName);
             PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Courses (CourseID, CourseName) VALUES (?,?)");
             ps.setInt(1, CourseID);
             ps.setString(2, CourseName);
 
             ps.executeUpdate();
-            System.out.println("Course added successfully");
-        } catch (SQLException exception) {
-            System.out.println(exception.getMessage());
-            System.out.println("Error. Something has gone wrong");
+            return "[\"status\": \"OK\"}";
+            //System.out.println("Course added successfully");
+        } catch (Exception exception) {
+            System.out.println("Database error" + exception.getMessage());
+            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+
         }
 
     }
-    public static void updateCourse(int CourseIDUpdated, String CourseName, int CourseID){
+    @POST
+    @Path("update")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String updateCourse(@FormDataParam("CourseIDUpdated") Integer CourseIDUpdated, @FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName){
         try{
+            if (CourseID == null || CourseName == null || CourseIDUpdated == null) {
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            System.out.println("courses/update CourseID=" + CourseID + "courses/update CourseName=" + CourseName + "courses/update CourseIDUpdated=" + CourseIDUpdated);
             PreparedStatement ps = Main.db.prepareStatement("UPDATE Courses SET CourseID = ?, CourseName = ? WHERE CourseID = ?");
             ps.setInt(1, CourseIDUpdated);
             ps.setString(2, CourseName);
             ps.setInt(3, CourseID);
             ps.executeUpdate();
-        }catch (Exception exception){
-            System.out.println(exception.getMessage());
-            System.out.println("Error. Something has gone wrong");
+            return "[\"status\": \"OK\"}";
+            //System.out.println("Course added successfully");
+        } catch (Exception exception) {
+            System.out.println("Database error" + exception.getMessage());
+            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
-    public static void deleteCourse(int CourseID){
+    @POST
+    @Path("delete")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String deleteCourse(@FormDataParam("CourseID") Integer CourseID){
         try{
+            if (CourseID == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            System.out.println("courses/delete CourseID=" + CourseID);
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Courses WHERE CourseID = ?");
             ps.setInt(1, CourseID);
             ps.executeUpdate();
-        }catch (SQLException exception) {
-            System.out.println(exception.getMessage());
-            System.out.println("Error. Something has gone wrong");
+            return "[\"status\": \"OK\"}";
+            //System.out.println("Course added successfully");
+        } catch (Exception exception) {
+            System.out.println("Database error" + exception.getMessage());
+            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
 }
