@@ -15,7 +15,7 @@ public class AdultsDB {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public  String selectAdult() {
+    public static String selectAdult() {
         System.out.println("adults/list/");
         JSONArray list = new JSONArray();
        // String Password = null;
@@ -50,7 +50,7 @@ public class AdultsDB {
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password) {
+    public static String insertAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password) {
         try {
             if (AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -73,7 +73,7 @@ public class AdultsDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password){
+    public static String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password){
         try{
             if (AdultUsernameUpdated == null ||AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -96,7 +96,7 @@ public class AdultsDB {
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteAdult(@FormDataParam("AdultUsername")String AdultUsername){
+    public static String deleteAdult(@FormDataParam("AdultUsername")String AdultUsername){
         try{
             if (AdultUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");

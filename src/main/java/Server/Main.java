@@ -170,7 +170,7 @@ private static void closeDatabase() {
         System.out.println("Is your account a student or adult account");
         String accountType = sc.nextLine();
         if(accountType == "adult") {
-            AdultsDB.updateAdults(newusername, fullname, password, '0', username);
+            //AdultsDB.updateAdults(newusername, fullname, password, '0', username);
         }else if(accountType == "student"){
             System.out.println("What adult username would you like to connect to?");
             String adultusername = sc.nextLine();

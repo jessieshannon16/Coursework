@@ -15,7 +15,7 @@ public class AvatarDB {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public String selectAvatar(){
+    public static String selectAvatar(){
         System.out.println("avatar/list/");
         JSONArray list = new JSONArray();
         try {
@@ -67,7 +67,7 @@ public class AvatarDB {
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertAvatar(@FormDataParam("StudentUsername")String StudentUsername,@FormDataParam("AvatarColour") String AvatarColour,@FormDataParam("AvatarImage") String AvatarImage, @FormDataParam("HungryImage")String HungryImage,@FormDataParam("DirtyImage") String DirtyImage, @FormDataParam("ConfusedImage") String ConfusedImage, @FormDataParam("HDImage") String HDImage, @FormDataParam("HCImage") String HCImage, @FormDataParam("DCImage") String DCImage,@FormDataParam("HCDImage") String HCDImage) {
+    public static String insertAvatar(@FormDataParam("StudentUsername")String StudentUsername,@FormDataParam("AvatarColour") String AvatarColour,@FormDataParam("AvatarImage") String AvatarImage, @FormDataParam("HungryImage")String HungryImage,@FormDataParam("DirtyImage") String DirtyImage, @FormDataParam("ConfusedImage") String ConfusedImage, @FormDataParam("HDImage") String HDImage, @FormDataParam("HCImage") String HCImage, @FormDataParam("DCImage") String DCImage,@FormDataParam("HCDImage") String HCDImage) {
         try {
             if (StudentUsername == null || AvatarColour == null || AvatarImage == null|| HungryImage == null|| ConfusedImage == null|| DirtyImage == null|| HDImage == null|| HCImage == null|| DCImage == null|| HCDImage == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -98,7 +98,7 @@ public class AvatarDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateAvatar(@FormDataParam("StudentUsernameUpdated")String StudentUsernameUpdated, @FormDataParam("StudentUsername")String StudentUsername,@FormDataParam("AvatarColour") String AvatarColour,@FormDataParam("AvatarImage") String AvatarImage, @FormDataParam("HungryImage")String HungryImage,@FormDataParam("DirtyImage") String DirtyImage, @FormDataParam("ConfusedImage") String ConfusedImage, @FormDataParam("HDImage") String HDImage, @FormDataParam("HCImage") String HCImage, @FormDataParam("DCImage") String DCImage,@FormDataParam("HCDImage") String HCDImage){
+    public static String updateAvatar(@FormDataParam("StudentUsernameUpdated")String StudentUsernameUpdated, @FormDataParam("StudentUsername")String StudentUsername,@FormDataParam("AvatarColour") String AvatarColour,@FormDataParam("AvatarImage") String AvatarImage, @FormDataParam("HungryImage")String HungryImage,@FormDataParam("DirtyImage") String DirtyImage, @FormDataParam("ConfusedImage") String ConfusedImage, @FormDataParam("HDImage") String HDImage, @FormDataParam("HCImage") String HCImage, @FormDataParam("DCImage") String DCImage,@FormDataParam("HCDImage") String HCDImage){
         try{
             if (StudentUsernameUpdated == null || StudentUsername == null || AvatarColour == null || AvatarImage == null|| HungryImage == null|| ConfusedImage == null|| DirtyImage == null|| HDImage == null|| HCImage == null|| DCImage == null|| HCDImage == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -128,7 +128,7 @@ public class AvatarDB {
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteAvatar(@FormDataParam("StudentUsername")String StudentUsername){
+    public static String deleteAvatar(@FormDataParam("StudentUsername")String StudentUsername){
         try{
             if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");

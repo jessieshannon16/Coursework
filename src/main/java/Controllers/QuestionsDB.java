@@ -15,7 +15,7 @@ public class QuestionsDB {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public String selectQuestion() {
+    public static String selectQuestion() {
         System.out.println("questions/list/");
         JSONArray list = new JSONArray();
         try {
@@ -51,7 +51,7 @@ public class QuestionsDB {
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertQuestion(@FormDataParam("QuestionID") Integer QuestionID, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("Question") String Question, @FormDataParam("CorrectAnswer") String CorrectAnswer, @FormDataParam("IncorrectAnswer1") String IncorrectAnswer1, @FormDataParam("IncorrectAnswer2") String IncorrectAnswer2, @FormDataParam("IncorrectAnswer3") String IncorrectAnswer3) {
+    public static String insertQuestion(@FormDataParam("QuestionID") Integer QuestionID, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("Question") String Question, @FormDataParam("CorrectAnswer") String CorrectAnswer, @FormDataParam("IncorrectAnswer1") String IncorrectAnswer1, @FormDataParam("IncorrectAnswer2") String IncorrectAnswer2, @FormDataParam("IncorrectAnswer3") String IncorrectAnswer3) {
         try {
             if (QuestionID == null || CourseID == null || Question == null || CorrectAnswer == null || IncorrectAnswer1 == null || IncorrectAnswer2 == null || IncorrectAnswer3 == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -80,7 +80,7 @@ public class QuestionsDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateQuestion(@FormDataParam("QuestionIDUpdated") Integer QuestionIDUpdated, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("Question") String Question, @FormDataParam("CorrectAnswer") String CorrectAnswer, @FormDataParam("IncorrectAnswer1") String IncorrectAnswer1, @FormDataParam("IncorrectAnswer2") String IncorrectAnswer2, @FormDataParam("IncorrectAnswer3") String IncorrectAnswer3, @FormDataParam("QuestionID") Integer QuestionID){
+    public static String updateQuestion(@FormDataParam("QuestionIDUpdated") Integer QuestionIDUpdated, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("Question") String Question, @FormDataParam("CorrectAnswer") String CorrectAnswer, @FormDataParam("IncorrectAnswer1") String IncorrectAnswer1, @FormDataParam("IncorrectAnswer2") String IncorrectAnswer2, @FormDataParam("IncorrectAnswer3") String IncorrectAnswer3, @FormDataParam("QuestionID") Integer QuestionID){
         try{
             if (QuestionIDUpdated == null ||QuestionID == null || CourseID == null || Question == null || CorrectAnswer == null || IncorrectAnswer1 == null || IncorrectAnswer2 == null || IncorrectAnswer3 == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -106,7 +106,7 @@ public class QuestionsDB {
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteQuestion(@FormDataParam("QuestionID") Integer QuestionID){
+    public static String deleteQuestion(@FormDataParam("QuestionID") Integer QuestionID){
         try{
             if (QuestionID == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");

@@ -16,7 +16,7 @@ import java.sql.SQLException;
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-        public String selectStudent(//String Username
+        public static String selectStudent(//String Username
                                             ) {
         System.out.println("students/list");
         JSONArray list = new JSONArray();
@@ -55,7 +55,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String insertStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername) {
+        public static String insertStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername) {
             try {
                 if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -80,7 +80,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentNameUpdated") String StudentUsernameUpdated){
+        public static String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentNameUpdated") String StudentUsernameUpdated){
             try{
                 if (StudentUsernameUpdated == null ||StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -104,7 +104,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String deleteStudent(@FormDataParam("StudentUsername") String StudentUsername){
+        public static String deleteStudent(@FormDataParam("StudentUsername") String StudentUsername){
             try{
                 if (StudentUsername == null){
                     throw new Exception("One or more form data parameters are missing in the HTTP request");

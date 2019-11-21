@@ -18,7 +18,7 @@ public class CoursesDB {
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
 
-    public String selectCourse(){
+    public static String selectCourse(){
         System.out.println("courses/list/");
         JSONArray list = new JSONArray();
         try {
@@ -46,7 +46,7 @@ public class CoursesDB {
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertCourse(@FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName) {
+    public static String insertCourse(@FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName) {
         try {
             if (CourseID == null || CourseName == null) {
             throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -70,7 +70,7 @@ public class CoursesDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateCourse(@FormDataParam("CourseIDUpdated") Integer CourseIDUpdated, @FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName){
+    public static String updateCourse(@FormDataParam("CourseIDUpdated") Integer CourseIDUpdated, @FormDataParam("CourseID") Integer CourseID,@FormDataParam("CourseName") String CourseName){
         try{
             if (CourseID == null || CourseName == null || CourseIDUpdated == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -92,7 +92,7 @@ public class CoursesDB {
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteCourse(@FormDataParam("CourseID") Integer CourseID){
+    public static String deleteCourse(@FormDataParam("CourseID") Integer CourseID){
         try{
             if (CourseID == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");

@@ -15,7 +15,7 @@ public class StudentCoursesDB {
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
-    public String selectStudentCourse() {
+    public static String selectStudentCourse() {
         System.out.println("studentcourses/list/");
         JSONArray list = new JSONArray();
         try {
@@ -43,7 +43,7 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String insertStudentCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID) {
+    public static String insertStudentCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID) {
         try {
             if (StudentUsername == null || CourseID == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -66,7 +66,7 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String updateStudentCourse(@FormDataParam("StudentUsernameUpdated") String StudentUsernameUpdated,@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
+    public static String updateStudentCourse(@FormDataParam("StudentUsernameUpdated") String StudentUsernameUpdated,@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
         try{
             if (StudentUsername == null || CourseID == null || StudentUsernameUpdated == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -88,7 +88,7 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String deleteStudentCourse(@FormDataParam("StudentUsername")String StudentUsername){
+    public static String deleteStudentCourse(@FormDataParam("StudentUsername")String StudentUsername){
         try{
             if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
