@@ -60,7 +60,51 @@ public class AdultsDB {
         }
     }
 
+    @GET
+    @Path("get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String get(@FormDataParam("AdultUsername") String AdultUsername){
+        System.out.println("adults/get");
+        JSONArray list = new JSONArray();
+        JSONArray studentList = new JSONArray();
+        try{
+            if(AdultUsername == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password FROM Adults WHERE AdultUsername = ?");
+            ps.setString(1, AdultUsername);
+            ResultSet results = ps.executeQuery();
 
+            if (results.next()){
+                JSONObject item = new JSONObject();
+                item.put("AdultUsername", results.getString(1));
+                item.put("AdultName", results.getString(2));
+                item.put("Password", results.getString(3));
+                list.add(item);
+            }else{
+                return "{\"error\": \"This username hasn't got any details\"}";
+            }
+            PreparedStatement student = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE AdultUsername = ?");
+            student.setString(1, AdultUsername);
+            ResultSet usernames = student.executeQuery();
+
+            if (usernames.next()){
+                while(usernames.next()){
+                    JSONObject names = new JSONObject();
+                    names.put("StudentUsername", usernames.getString(1));
+                    studentList.add(names);
+                }
+            }else{
+                return "{\"error\": \"This username has no students attached to it\"}";
+            }
+            return "{\"error\": \"This username has an error\"}";
+
+        }catch (Exception exception){
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to view profile, please see server console for more info.\"}";
+        }
+
+    }
 
 
 

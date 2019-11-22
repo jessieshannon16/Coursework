@@ -40,6 +40,39 @@ import java.sql.SQLException;
         }
     }
     @GET
+    @Path("get")
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String get(@FormDataParam("StudentUsername") String StudentUsername){
+        System.out.println("students/get");
+        JSONArray list = new JSONArray();
+        try{
+            if (StudentUsername == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, LastDate FROM Students WHERE StudentUsername = ?");
+            ps.setString(1, StudentUsername);
+            ResultSet results = ps.executeQuery();
+            if (results.next()) {
+                JSONObject item = new JSONObject();
+                item.put("StudentUsername", results.getString(1));
+                item.put("StudentName", results.getString(2));
+                item.put("Password", results.getString(3));
+                item.put("AdultUsername", results.getString(4));
+                item.put("LastDate", results.getString(5));
+                list.add(item);
+                return item.toString();
+            }else{
+                return "{\"error\": \"Unable to find details linking to this student username\"}";
+
+            }
+
+
+        }catch (Exception exception){
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to view profile, please see server console for more info.\"}";
+        }
+    }
+    @GET
     @Path("chooseCourse")
     @Produces(MediaType.APPLICATION_JSON)
     public static String chooseCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
