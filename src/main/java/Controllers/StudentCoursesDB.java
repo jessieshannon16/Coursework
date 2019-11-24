@@ -71,7 +71,7 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
             if (StudentUsername == null || CourseID == null || StudentUsernameUpdated == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
-            System.out.println("studentcourses/update StudentUsername=" + StudentUsername + "studentcourses/update CourseID=" + CourseID + "studentcourses/update StudentUsernameUpdated=" + StudentUsernameUpdated);
+
             PreparedStatement ps = Main.db.prepareStatement("UPDATE StudentCourses SET StudentUsername = ?, CourseID = ? WHERE StudentUsername = ?");
             ps.setString(1, StudentUsernameUpdated);
             ps.setInt(2, CourseID);
@@ -80,7 +80,7 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
             return "[\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
-            System.out.println("Database error" + exception.getMessage());
+            System.out.println("Database error " + exception.getMessage());
             return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }

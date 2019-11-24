@@ -1,7 +1,8 @@
 package Server;
 
 import Controllers.AdultsDB;
-import Controllers.AvatarDB;
+import Controllers.AvatarTypeDB;
+import Controllers.AvatarStatsDB;
 import Controllers.StudentsDB;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
@@ -237,7 +238,7 @@ private static void closeDatabase() {
         }else if (decision.equals("student")){
             System.out.println("Please enter your teachers/ parents username");
             String adultUsername = sc.nextLine();
-            StudentsDB.insertStudent(name,username,password,adultUsername);
+            //StudentsDB.insertStudent(name,username,password,adultUsername);
             //Controllers.StudentsDB.selectStudent();
         }else{
             System.out.println("Error with entering in student/adult");

@@ -13,7 +13,7 @@ import java.sql.SQLException;
 @Path("avatartype/")
 public class AvatarTypeDB {
 
-    @GET
+    @POST
     @Path("choose")
     @Produces(MediaType.APPLICATION_JSON)
     public static String choose(@FormDataParam("StudentUsername") String StudentUsername,@FormDataParam("AvatarID") Integer AvatarID ){
@@ -31,7 +31,7 @@ public class AvatarTypeDB {
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
-            return "{\"error\": \"Unable to list items, please see server console for more info.\"}";
+            return "{\"error\": \"Unable to update avatar, please see server console for more info.\"}";
         }
     }
 

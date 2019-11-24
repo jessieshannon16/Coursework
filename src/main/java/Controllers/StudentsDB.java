@@ -13,8 +13,9 @@ import java.sql.SQLException;
 
 @Path("students/")
     public class StudentsDB {
-    @GET
+    @POST
     @Path("logon")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String logon(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Password") String Password){
         System.out.println("students/logon");
@@ -39,8 +40,9 @@ import java.sql.SQLException;
             return "{\"error\": \"Unable to logon, please see server console for more info.\"}";
         }
     }
-    @GET
+    @POST
     @Path("get")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String get(@FormDataParam("StudentUsername") String StudentUsername){
         System.out.println("students/get");
@@ -65,15 +67,13 @@ import java.sql.SQLException;
                 return "{\"error\": \"Unable to find details linking to this student username\"}";
 
             }
-
-
         }catch (Exception exception){
             System.out.println("Database error: " + (exception.getMessage()));
             return "{\"error\": \"Unable to view profile, please see server console for more info.\"}";
         }
     }
-    @GET
-    @Path("chooseCourse")
+    @POST
+    @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
     public static String chooseCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
         try{
@@ -84,8 +84,7 @@ import java.sql.SQLException;
             ps.setString(1, StudentUsername);
             ResultSet results = ps.executeQuery();
             if (results.next()){
-            while (results.next());
-                {
+                while (results.next());{
                     // stores the outputs in a variable
                     Integer takenCourseID = results.getInt(1);
                     if (CourseID.equals(takenCourseID)) {
@@ -103,7 +102,8 @@ import java.sql.SQLException;
             }else {//if the student hasn't currently got any courses, the username needs to first be validated and then it can be added
                 PreparedStatement check = Main.db.prepareStatement("SELECT * FROM Students WHERE StudentUsername = ?");
                 check.setString(1, StudentUsername);
-                if (results.next()) {
+                ResultSet checkresult = check.executeQuery();
+                if (checkresult.next()) {
                 PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
                 ps2.setString(1, StudentUsername);
                 ps2.setInt(2, CourseID);
@@ -117,9 +117,9 @@ import java.sql.SQLException;
         }catch (Exception exception){
         System.out.println("Database error: " + (exception.getMessage()));
         return "{\"error\": \"Unable to add the course, please see server console for more info.\"}";
+        }
     }
-    }
-    @GET
+    @POST
     @Path("courses")
     @Produces(MediaType.APPLICATION_JSON)
     public static String viewCourses(@FormDataParam("StudentUsername") String StudentUsername) {
@@ -134,13 +134,17 @@ import java.sql.SQLException;
             ps.setString(1, StudentUsername);
 
             ResultSet results = ps.executeQuery();
-            while (results.next()){
-                JSONObject item = new JSONObject();
-                item.put("Course Name", results.getString(1));
-                item.put("Score", results.getInt(2));
-                list.add(item);
+            if (results.next()) {
+                while (results.next()) {
+                    JSONObject item = new JSONObject();
+                    item.put("Course Name", results.getString(1));
+                    item.put("Score", results.getInt(2));
+                    list.add(item);
+                }
+                return list.toString();
+            }else{
+                return "{\"error\": \"No courses for this Username\"}";
             }
-            return list.toString();
         } catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
             return "{\"error\": \"Unable to list courses, please see server console for more info.\"}";
@@ -155,7 +159,7 @@ import java.sql.SQLException;
         JSONArray list = new JSONArray();
         //String Password = null;
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, Level FROM Students ");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, StudentName, Password, AdultUsername, LastDate, AvatarID FROM Students ");
             //WHERE StudentUsername = ?
             //test pull works
             //ps.setString(1, Username);
@@ -166,7 +170,8 @@ import java.sql.SQLException;
                 item.put("StudentName", results.getString(2));
                 item.put("Password", results.getString(3));
                 item.put("AdultsUsername", results.getString(4));
-                item.put("Level", results.getString(5));
+                item.put("LastDate", results.getString(5));
+                item.put("AvatarID", results.getInt(6));
                 list.add(item);
                 /*String StudentUsername = results.getString(1);
                 String StudentName = results.getString(2);
@@ -188,17 +193,18 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public static String insertStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername) {
+        public String insertStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername) {
             try {
                 if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
                 }
                 System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername, level) VALUES (?,?,?,?,0)");
+                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");
                 ps.setString(1, StudentName);
                 ps.setString(2, StudentUsername);
                 ps.setString(3, Password);
                 ps.setString(4, AdultUsername);
+
                 ps.executeUpdate();
 
                 return "[\"status\": \"OK\"}";
@@ -213,7 +219,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public static String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentNameUpdated") String StudentUsernameUpdated){
+        public static String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentUsernameUpdated") String StudentUsernameUpdated){
             try{
                 if (StudentUsernameUpdated == null ||StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");

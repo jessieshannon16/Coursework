@@ -2,7 +2,7 @@ package Controllers;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import Server.Main;
-import jdk.nashorn.internal.objects.annotations.Getter;
+//import jdk.nashorn.internal.objects.annotations.Getter;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -18,7 +18,7 @@ import javax.ws.rs.core.MediaType;
 @Path("avatarstats/")
 
 public class AvatarStatsDB {
-    @GET
+    @POST
     @Path("feed")
     @Produces(MediaType.APPLICATION_JSON)
     public static String feed(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Hunger") Integer Hunger){
@@ -38,17 +38,17 @@ public class AvatarStatsDB {
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
-            return "{\"error\": \"Unable feed avatar, please see server console for more info.\"}";
+            return "{\"error\": \"Unable to feed avatar, please see server console for more info.\"}";
             // System.out.println("Error. Something has gone wrong");
         }
 
     }
 
-    @GET
+    @POST
     @Path("clean")
     @Produces(MediaType.APPLICATION_JSON)
     public static String clean(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Cleanliness") Integer Cleanliness){
-        System.out.println("avatarstats/feed");
+        System.out.println("avatarstats/clean");
 
         try {
             if (StudentUsername == null || Cleanliness == null){
@@ -64,12 +64,12 @@ public class AvatarStatsDB {
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
-            return "{\"error\": \"Unable to feed avatar, please see server console for more info.\"}";
+            return "{\"error\": \"Unable to clean avatar, please see server console for more info.\"}";
             // System.out.println("Error. Something has gone wrong");
         }
 
     }
-    @GET
+    @POST
     @Path("view")
     @Produces(MediaType.APPLICATION_JSON)
 

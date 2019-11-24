@@ -12,14 +12,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 @Path("adults/")
 public class AdultsDB {
-    @GET
+    @POST
     @Path("courses")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String courses(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("StudentUsername") String StudentUsername){
+    public static String courses(@FormDataParam("AdultUsername") String AdultUsername){
         JSONArray list = new JSONArray();
         System.out.println("adults/courses");
         try{
-            if (StudentUsername == null || AdultUsername == null){
+            if (AdultUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
 
@@ -27,32 +27,30 @@ public class AdultsDB {
             ps.setString(1, AdultUsername);
             ResultSet results = ps.executeQuery();
 
-            if (results.next()){
-                while (results.next()) {
-                    String AdultsStudents = results.getString(1);
-                    PreparedStatement fetch = Main.db.prepareStatement("SELECT Courses.CourseName, StudentCourses.Score FROM Courses INNER JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID WHERE StudentCourses.StudentUsername = ? ");
-                    fetch.setString(1, AdultsStudents);
-                    ResultSet courses = fetch.executeQuery();
-
-                    if (courses.next()){
-                        while(courses.next()){
-                            JSONObject item = new JSONObject();
-                            item.put("StudentName", AdultsStudents);
-                            item.put("Course Name", results.getString(1));
-                            item.put("Score", results.getInt(2));
-                            list.add(item);
-                        }
-                        return list.toString();
-                    }else{
-                        return "{\"error\": \"" + AdultsStudents + "\"has no courses!\"}";
-                    }
-                }
-            }else{
-                return "{\"error\": \"You have no students!\"}";
+            if(!results.next()){
+                return "{\"error\": \"This user has no students\"}";
 
             }
+            while (results.next()) {
+                String AdultsStudents = results.getString(1);
+                System.out.println(AdultsStudents);
 
-            return "{\"error\": \"You have no students!\"}";
+                PreparedStatement fetch = Main.db.prepareStatement("SELECT Courses.CourseName, StudentCourses.Score FROM Courses INNER JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID WHERE StudentCourses.StudentUsername = ? ");
+                fetch.setString(1, AdultsStudents);
+                ResultSet courses = fetch.executeQuery();
+
+                while(courses.next()){
+                    JSONObject item = new JSONObject();
+                    item.put("StudentName", AdultsStudents);
+                    item.put("Course Name", courses.getString(1));
+                    item.put("Score", courses.getInt(2));
+                    list.add(item);
+                }
+
+            }
+            return list.toString();
+
+
 
         }catch (Exception exception){
             System.out.println("Database error: " + (exception.getMessage()));
@@ -60,7 +58,7 @@ public class AdultsDB {
         }
     }
 
-    @GET
+    @POST
     @Path("get")
     @Produces(MediaType.APPLICATION_JSON)
     public static String get(@FormDataParam("AdultUsername") String AdultUsername){
@@ -74,30 +72,39 @@ public class AdultsDB {
             PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername, AdultName, Password FROM Adults WHERE AdultUsername = ?");
             ps.setString(1, AdultUsername);
             ResultSet results = ps.executeQuery();
+            PreparedStatement student = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE AdultUsername = ?");
+            student.setString(1, AdultUsername);
+            ResultSet usernames = student.executeQuery();
 
-            if (results.next()){
+            if (results.next() && usernames.next()) {
                 JSONObject item = new JSONObject();
                 item.put("AdultUsername", results.getString(1));
                 item.put("AdultName", results.getString(2));
                 item.put("Password", results.getString(3));
                 list.add(item);
-            }else{
-                return "{\"error\": \"This username hasn't got any details\"}";
-            }
-            PreparedStatement student = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE AdultUsername = ?");
-            student.setString(1, AdultUsername);
-            ResultSet usernames = student.executeQuery();
-
-            if (usernames.next()){
+                while (usernames.next()) {
+                    JSONObject names = new JSONObject();
+                    names.put("StudentUsername", usernames.getString(1));
+                    studentList.add(names);
+                }
+                return list.toString() + studentList.toString();
+            }else if (results.next()) {
+                JSONObject item = new JSONObject();
+                item.put("AdultUsername", results.getString(1));
+                item.put("AdultName", results.getString(2));
+                item.put("Password", results.getString(3));
+                list.add(item);
+                return list.toString() + "{\"error\": \"This username has no students attached to it\"}";
+            }else if(usernames.next()){
                 while(usernames.next()){
                     JSONObject names = new JSONObject();
                     names.put("StudentUsername", usernames.getString(1));
                     studentList.add(names);
                 }
+                return studentList.toString() + "{\"error\": \"This username hasn't got any details\"}";
             }else{
-                return "{\"error\": \"This username has no students attached to it\"}";
+                return "{\"error\": \"This username hasn't got any details\"}";
             }
-            return "{\"error\": \"This username has an error\"}";
 
         }catch (Exception exception){
             System.out.println("Database error: " + (exception.getMessage()));
@@ -109,12 +116,15 @@ public class AdultsDB {
 
 
 
-    @GET
+    @POST
     @Path("logon")
     @Produces(MediaType.APPLICATION_JSON)
     public static String logon(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("Password") String Password){
         System.out.println("adults/logon");
         try{
+            if (AdultUsername == null|| Password == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
             PreparedStatement ps = Main.db.prepareStatement("SELECT Password FROM Adults WHERE AdultUsername = ?");
             ps.setString(1, AdultUsername);
             ResultSet results = ps.executeQuery();
@@ -135,8 +145,8 @@ public class AdultsDB {
             return "{\"error\": \"Unable to logon, please see server console for more info.\"}";
         }
     }
-    @GET
-    @Path("chooseCourse")
+    @POST
+    @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
     public static String chooseCourse(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("StudentUsername") String StudentUsername) {
         try {
@@ -149,41 +159,11 @@ public class AdultsDB {
             if (results.next()) {
                 String correctAdult = results.getString(1);
                 if (AdultUsername.equals(correctAdult)) {
-                    PreparedStatement ps = Main.db.prepareStatement("SELECT CourseID FROM StudentCourses WHERE StudentUsername = ? ");
-                    ps.setString(1, StudentUsername);
-                    ResultSet results2 = ps.executeQuery();
-                    if (results2.next()) {
-                        // need to add a statement in case the string is empty
-                        while (results2.next()) ;
-                        {
-                            // stores the outputs in a variable
-                            Integer takenCourseID = results2.getInt(1);
-                            if (CourseID.equals(takenCourseID)) {
-                                //Id the CourseID is already stored as a course the student takes, the program throws an error
-                                return "{\"error\": \"You are already taking this course!\"}";
-                            } else {
-                                //If the CourseID can't be found within the table, the course is added as a students course
-                                PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
-                                ps2.setString(1, StudentUsername);
-                                ps2.setInt(2, CourseID);
-                                ps2.executeUpdate();
-                                return "{\"Success\": \"You are now taking this course!\"}";
-                            }
-                        }
-                    } else {//if the student hasn't currently got any courses, the username needs to first be validated and then it can be added
-                        PreparedStatement check = Main.db.prepareStatement("SELECT * FROM Students WHERE StudentUsername = ?");
-                        check.setString(1, StudentUsername);
-                        if (results.next()) {
-                            PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
-                            ps2.setString(1, StudentUsername);
-                            ps2.setInt(2, CourseID);
-                            ps2.executeUpdate();
-                            return "{\"Success\": \"You are now taking this course!\"}";
-                        } else {
-                            return "{\"error\": \"StudentUsername is not recognised\"}";
-
-                        }
-                    }
+                    PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
+                    ps2.setString(1, StudentUsername);
+                    ps2.setInt(2, CourseID);
+                    ps2.executeUpdate();
+                    return "{\"Success\": \"Your student is now taking this course!\"}";
                 }else{
                     return "{\"error\": \"You don't have control over this students account\"}";
 
@@ -259,13 +239,13 @@ public class AdultsDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password){
+    public static String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName") String AdultName,@FormDataParam("Password") String Password){
         try{
             if (AdultUsernameUpdated == null ||AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("adults/update AdultUsernameUpdated=" + AdultUsernameUpdated +"adults/update AdultUsername=" + AdultUsername + "adults/update AdultName=" + AdultName + "adults/update Password=" + Password);
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Adults SET AdultUsername = ?, AdultName = ?, Password = ?, NoOfStudents = ? WHERE AdultUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Adults SET AdultUsername = ?, AdultName = ?, Password = ? WHERE AdultUsername = ?");
             ps.setString(1, AdultUsernameUpdated);
             ps.setString(2, AdultName);
             ps.setString(3, Password);
