@@ -10,12 +10,17 @@ import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
+
 @Path("adults/")
 public class AdultsDB {
     @POST
     @Path("courses")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String courses(@FormDataParam("AdultUsername") String AdultUsername){
+    public static String courses(@FormDataParam("AdultUsername") String AdultUsername, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         JSONArray list = new JSONArray();
         System.out.println("adults/courses");
         try{
@@ -61,7 +66,10 @@ public class AdultsDB {
     @POST
     @Path("get")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String get(@FormDataParam("AdultUsername") String AdultUsername){
+    public static String get(@FormDataParam("AdultUsername") String AdultUsername, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         System.out.println("adults/get");
         JSONArray list = new JSONArray();
         JSONArray studentList = new JSONArray();
@@ -133,7 +141,18 @@ public class AdultsDB {
                 String correctPassword = results.getString(1);
 
                 if (Password.equals(correctPassword)){
-                    return "[\"logon successful! Welcome\": \"" + AdultUsername + "\"}";
+                    String token = UUID.randomUUID().toString();
+
+                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Adults SET Token = ? WHERE AdultUsername = ?");
+                    ps2.setString(1, token);
+                    ps2.setString(2, AdultUsername);
+                    ps2.executeUpdate();
+
+                    JSONObject userDetails = new JSONObject();
+                    userDetails.put("username", AdultUsername);
+                    userDetails.put("token", token);
+                    return userDetails.toString();
+                   //return "[\"logon successful! Welcome\": \"" + AdultUsername + "\"}";
                 }else{
                     return "{\"error\": \"Incorrect password\"}";
                 }
@@ -146,9 +165,62 @@ public class AdultsDB {
         }
     }
     @POST
+    @Path("logout")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String logoutUser(@CookieParam("token") String token) {
+
+        try {
+
+            System.out.println("user/logout");
+
+            PreparedStatement ps1 = Main.db.prepareStatement("SELECT AdultUsername FROM Adults WHERE Token = ?");
+            ps1.setString(1, token);
+            ResultSet logoutResults = ps1.executeQuery();
+            if (logoutResults.next()) {
+
+                int id = logoutResults.getInt(1);
+
+                PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Adults SET Token = NULL WHERE AdultUsername = ?");
+                ps2.setInt(1, id);
+                ps2.executeUpdate();
+
+                return "{\"status\": \"OK\"}";
+
+            } else {
+
+                return "{\"error\": \"Invalid token!\"}";
+
+            }
+
+        } catch (Exception exception){
+            System.out.println("Database error during /user/logout: " + exception.getMessage());
+            return "{\"error\": \"Server side error!\"}";
+        }
+
+    }
+
+    public static boolean validToken(String token) {
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AdultUsername FROM Adults WHERE Token = ?");
+            ps.setString(1, token);
+            ResultSet logoutResults = ps.executeQuery();
+            return logoutResults.next();
+        } catch (Exception exception) {
+            System.out.println("Database error during /user/logout: " + exception.getMessage());
+            return false;
+        }
+    }
+
+
+
+    @POST
     @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String chooseCourse(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("StudentUsername") String StudentUsername) {
+    public static String chooseCourse(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try {
             if (StudentUsername == null || CourseID == null || AdultUsername == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -216,7 +288,10 @@ public class AdultsDB {
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String insertAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password) {
+    public static String insertAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try {
             if (AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -239,7 +314,10 @@ public class AdultsDB {
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName") String AdultName,@FormDataParam("Password") String Password){
+    public static String updateAdults(@FormDataParam("AdultUsernameUpdated")String AdultUsernameUpdated, @FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName") String AdultName,@FormDataParam("Password") String Password, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try{
             if (AdultUsernameUpdated == null ||AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -262,7 +340,10 @@ public class AdultsDB {
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String deleteAdult(@FormDataParam("AdultUsername")String AdultUsername){
+    public static String deleteAdult(@FormDataParam("AdultUsername")String AdultUsername, @CookieParam("token") String token) {
+        if (!AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try{
             if (AdultUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");

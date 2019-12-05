@@ -10,6 +10,7 @@ import javax.ws.rs.core.MediaType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 @Path("students/")
     public class StudentsDB {
@@ -28,11 +29,24 @@ import java.sql.SQLException;
 
                 String correctPassword = results.getString(1);
                 if (Password.equals(correctPassword)){
-                    return "[\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
+                    String token = UUID.randomUUID().toString();
+
+                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Users SET Token = ? WHERE Username = ?");
+                    ps2.setString(1, token);
+                    ps2.setString(2, StudentUsername);
+                    ps2.executeUpdate();
+
+                    JSONObject userDetails = new JSONObject();
+                    userDetails.put("username", StudentUsername);
+                    userDetails.put("token", token);
+                    return userDetails.toString();
+
+                    //return "[\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
                 }else{
                     return "{\"error\": \"Incorrect password\"}";
                 }
             }else{
+                AdultsDB.logon(StudentUsername, Password);
                 return "{\"error\": \"Unknown user\"}";
             }
         }catch (Exception exception){
@@ -41,10 +55,60 @@ import java.sql.SQLException;
         }
     }
     @POST
+    @Path("logout")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String logoutUser(@CookieParam("token") String token) {
+
+        try {
+
+            System.out.println("user/logout");
+
+            PreparedStatement ps1 = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE Token = ?");
+            ps1.setString(1, token);
+            ResultSet logoutResults = ps1.executeQuery();
+            if (logoutResults.next()) {
+
+                int id = logoutResults.getInt(1);
+
+                PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Students SET Token = NULL WHERE StudentUsername = ?");
+                ps2.setInt(1, id);
+                ps2.executeUpdate();
+
+                return "{\"status\": \"OK\"}";
+
+            } else {
+
+                return "{\"error\": \"Invalid token!\"}";
+
+            }
+
+        } catch (Exception exception){
+            System.out.println("Database error during /user/logout: " + exception.getMessage());
+            return "{\"error\": \"Server side error!\"}";
+        }
+
+    }
+
+    public static boolean validToken(String token) {
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE Token = ?");
+            ps.setString(1, token);
+            ResultSet logoutResults = ps.executeQuery();
+            return logoutResults.next();
+        } catch (Exception exception) {
+            System.out.println("Database error during /user/logout: " + exception.getMessage());
+            return false;
+        }
+    }
+    @POST
     @Path("get")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String get(@FormDataParam("StudentUsername") String StudentUsername){
+    public static String get(@FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         System.out.println("students/get");
         JSONArray list = new JSONArray();
         try{
@@ -75,7 +139,10 @@ import java.sql.SQLException;
     @POST
     @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String chooseCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
+    public static String chooseCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try{
             if (StudentUsername == null || CourseID == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -122,7 +189,10 @@ import java.sql.SQLException;
     @POST
     @Path("courses")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String viewCourses(@FormDataParam("StudentUsername") String StudentUsername) {
+    public static String viewCourses(@FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         JSONArray list = new JSONArray();
         System.out.println("students/courses");
         try {
@@ -193,7 +263,10 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("insert")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String insertStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername) {
+        public String insertStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
             try {
                 if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -219,7 +292,10 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public static String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentUsernameUpdated") String StudentUsernameUpdated){
+        public static String updateStudent(@FormDataParam("StudentName") String StudentName,@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername , @FormDataParam("StudentUsernameUpdated") String StudentUsernameUpdated, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
             try{
                 if (StudentUsernameUpdated == null ||StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -243,7 +319,10 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("delete")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public static String deleteStudent(@FormDataParam("StudentUsername") String StudentUsername){
+        public static String deleteStudent(@FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
             try{
                 if (StudentUsername == null){
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
