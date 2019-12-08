@@ -15,40 +15,86 @@ import java.util.UUID;
 @Path("students/")
     public class StudentsDB {
     @POST
+    @Path("checkLogon")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String checkLogon(@FormDataParam("StudentUsername") String Username, @FormDataParam("Password") String Password) {
+        System.out.println("students/check");
+        try {
+            PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Username = ?");
+            check.setString(1, Username);
+            ResultSet Type = check.executeQuery();
+            String userType = Type.getString(1);
+            if (userType.equals("Adult")) {
+                return AdultsDB.logon(Username, Password);
+            } else {
+                return StudentsDB.logon(Username, Password);
+            }
+        } catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to logon, failed at check, please see server console for more info.\"}";
+
+        }
+    }
+
+    @POST
+    @Path("checkLogout")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String checkLogout(@CookieParam("token") String token){
+        try {
+            PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Token = ?");
+            check.setString(1, token);
+            ResultSet Type = check.executeQuery();
+            String userType = Type.getString(1);
+            if (userType.equals("Adult")){
+                return AdultsDB.logout(token);
+            }else {
+                return StudentsDB.logout(token);
+            }
+    }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to logout, failed at check, please see server console for more info.\"}";
+
+        }
+    }
+    @POST
     @Path("logon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String logon(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Password") String Password){
         System.out.println("students/logon");
         try{
-            // still need to add the recalculation of avatar stats based on last played!
-            PreparedStatement ps = Main.db.prepareStatement("SELECT Password FROM Students WHERE StudentUsername = ?");
-            ps.setString(1, StudentUsername);
-            ResultSet results = ps.executeQuery();
-            if (results.next()) {
 
-                String correctPassword = results.getString(1);
-                if (Password.equals(correctPassword)){
-                    String token = UUID.randomUUID().toString();
+                // still need to add the recalculation of avatar stats based on last played!
+                PreparedStatement ps = Main.db.prepareStatement("SELECT Password FROM Students WHERE StudentUsername = ?");
+                ps.setString(1, StudentUsername);
+                ResultSet results = ps.executeQuery();
+                if (results.next()) {
 
-                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Users SET Token = ? WHERE Username = ?");
-                    ps2.setString(1, token);
-                    ps2.setString(2, StudentUsername);
-                    ps2.executeUpdate();
+                    String correctPassword = results.getString(1);
+                    if (Password.equals(correctPassword)) {
+                        String token = UUID.randomUUID().toString();
 
-                    JSONObject userDetails = new JSONObject();
-                    userDetails.put("username", StudentUsername);
-                    userDetails.put("token", token);
-                    return userDetails.toString();
+                        PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Students SET Token = ? WHERE StudentUsername = ?");
+                        ps2.setString(1, token);
+                        ps2.setString(2, StudentUsername);
+                        ps2.executeUpdate();
 
-                    //return "[\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
-                }else{
-                    return "{\"error\": \"Incorrect password\"}";
+                        JSONObject userDetails = new JSONObject();
+                        userDetails.put("username", StudentUsername);
+                        userDetails.put("token", token);
+                        return userDetails.toString();
+
+                        //return "[\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
+                    } else {
+                        return "{\"error\": \"Incorrect password\"}";
+                    }
+                } else {
+                    AdultsDB.logon(StudentUsername, Password);
+                    return "{\"error\": \"Unknown user\"}";
                 }
-            }else{
-                AdultsDB.logon(StudentUsername, Password);
-                return "{\"error\": \"Unknown user\"}";
-            }
+
         }catch (Exception exception){
             System.out.println("Database error: " + (exception.getMessage()));
             return "{\"error\": \"Unable to logon, please see server console for more info.\"}";
@@ -58,30 +104,30 @@ import java.util.UUID;
     @Path("logout")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String logoutUser(@CookieParam("token") String token) {
+    public static String logout(@CookieParam("token") String token) {
 
         try {
 
-            System.out.println("user/logout");
+                System.out.println("students/logout");
 
-            PreparedStatement ps1 = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE Token = ?");
-            ps1.setString(1, token);
-            ResultSet logoutResults = ps1.executeQuery();
-            if (logoutResults.next()) {
+                PreparedStatement ps1 = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE Token = ?");
+                ps1.setString(1, token);
+                ResultSet logoutResults = ps1.executeQuery();
+                if (logoutResults.next()) {
 
-                int id = logoutResults.getInt(1);
+                    int id = logoutResults.getInt(1);
 
-                PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Students SET Token = NULL WHERE StudentUsername = ?");
-                ps2.setInt(1, id);
-                ps2.executeUpdate();
+                    PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Students SET Token = NULL WHERE StudentUsername = ?");
+                    ps2.setInt(1, id);
+                    ps2.executeUpdate();
 
-                return "{\"status\": \"OK\"}";
+                    return "{\"status\": \"OK\"}";
 
-            } else {
+                } else {
 
-                return "{\"error\": \"Invalid token!\"}";
+                    return "{\"error\": \"Invalid token!\"}";
 
-            }
+                }
 
         } catch (Exception exception){
             System.out.println("Database error during /user/logout: " + exception.getMessage());
@@ -260,16 +306,26 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     }
 
     @POST
-    @Path("insert")
+    @Path("register")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String insertStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername, @CookieParam("token") String token) {
+        public String registerStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername, @CookieParam("token") String token) {
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
             try {
                 if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
+                }
+                PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT StudentUsername FROm Students");
+                ResultSet results = uniqueCheck.executeQuery();
+                if (results.next()){
+                    while(results.next()){
+                        String username = results.getString(1);
+                        if (username.equals(StudentUsername)){
+                            return "[\"Sorry. This username is already taken by an adult\"}";
+                        }
+                    }
                 }
                 System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
                 PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");

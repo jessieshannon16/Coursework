@@ -126,6 +126,7 @@ public class AdultsDB {
 
     @POST
     @Path("logon")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String logon(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("Password") String Password){
         System.out.println("adults/logon");
@@ -168,11 +169,11 @@ public class AdultsDB {
     @Path("logout")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String logoutUser(@CookieParam("token") String token) {
+    public static String logout(@CookieParam("token") String token) {
 
         try {
 
-            System.out.println("user/logout");
+            System.out.println("adults/logout");
 
             PreparedStatement ps1 = Main.db.prepareStatement("SELECT AdultUsername FROM Adults WHERE Token = ?");
             ps1.setString(1, token);
@@ -285,18 +286,30 @@ public class AdultsDB {
        // return Password;
     }
     @POST
-    @Path("insert")
+    @Path("register")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String insertAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password, @CookieParam("token") String token) {
-        if (!AdultsDB.validToken(token)) {
+    public static String registerAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password, @CookieParam("token") String token) {
+        /*if (!AdultsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
-        }
+        }*/
         try {
             if (AdultUsername == null || AdultName == null || Password == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("adults/insert AdultUsername=" + AdultUsername + "adults/insert AdultName=" + AdultName + "adults/insert Password=" + Password);
+
+            PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT AdultUsername FROm Adults");
+            ResultSet results = uniqueCheck.executeQuery();
+            if (results.next()){
+                while(results.next()){
+                    String username = results.getString(1);
+                        if (username.equals(AdultUsername)){
+                            return "[\"Sorry. This username is already taken by a student\"}";
+                        }
+                }
+            }
+
             PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Adults (AdultUsername, AdultName, Password) VALUES (?,?,?)");
             ps.setString(1, AdultUsername);
             ps.setString(2, AdultName);

@@ -158,7 +158,7 @@ private static void closeDatabase() {
 
 }
 
-    public static void updateAccount(){
+   /* public static void updateAccount(){
         Scanner sc = new Scanner(System.in);
         System.out.println("What is the username of the record you would like to change?");
         String username = sc.nextLine();
@@ -245,5 +245,5 @@ private static void closeDatabase() {
         }
 
 
-    }
+    }*/
 }
