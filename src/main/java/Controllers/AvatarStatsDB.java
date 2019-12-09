@@ -34,7 +34,7 @@ public class AvatarStatsDB {
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
 
-            return "[\"Your avatar is now less hungry!\"}";
+            return "{\"Your avatar is now less hungry!\"}";
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
@@ -60,7 +60,7 @@ public class AvatarStatsDB {
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
 
-            return "[\"Your avatar is now cleaner!\"}";
+            return "{\"Your avatar is now cleaner!\"}";
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
@@ -149,11 +149,11 @@ public class AvatarStatsDB {
             ps.setInt(4, Cleanliness);
             ps.setInt(5, Intelligence);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
 
         }
 
@@ -176,11 +176,11 @@ public class AvatarStatsDB {
             ps.setInt(5, Intelligence);
             ps.setString(6, StudentUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to update item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to update item, please see server console for more info\"}";
         }
     }
     @POST
@@ -196,11 +196,11 @@ public class AvatarStatsDB {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM AvatarStats WHERE StudentUsername = ?");
             ps.setString(1, StudentUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to delete item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to delete item, please see server console for more info\"}";
         }
     }
 }

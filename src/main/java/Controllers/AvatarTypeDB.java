@@ -53,7 +53,7 @@ public class AvatarTypeDB {
             return list.toString();
         }catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to display avatars, please see server console for more info\"}";
+            return "{\"error\": \"Unable to display avatars, please see server console for more info\"}";
         }
     }
 
@@ -131,11 +131,11 @@ public class AvatarTypeDB {
             ps.setString(10, HCDImage);
 
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
 
     }
@@ -162,11 +162,11 @@ public class AvatarTypeDB {
             ps.setString(10, HCDImage);
             ps.setInt(11, AvatarID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to update item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to update item, please see server console for more info\"}";
         }
     }
     @POST
@@ -182,11 +182,11 @@ public class AvatarTypeDB {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM AvatarType WHERE AvatarID = ?");
             ps.setInt(1, AvatarID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to delete item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to delete item, please see server console for more info\"}";
         }
     }
 }

@@ -57,11 +57,11 @@ public class CoursesDB {
             ps.setString(2, CourseName);
 
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
 
         }
 
@@ -81,11 +81,11 @@ public class CoursesDB {
             ps.setString(2, CourseName);
             ps.setInt(3, CourseID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
     @POST
@@ -101,11 +101,11 @@ public class CoursesDB {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Courses WHERE CourseID = ?");
             ps.setInt(1, CourseID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
 }

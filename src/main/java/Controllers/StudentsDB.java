@@ -18,12 +18,15 @@ import java.util.UUID;
     @Path("checkLogon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String checkLogon(@FormDataParam("StudentUsername") String Username, @FormDataParam("Password") String Password) {
+    public static String checkLogon(@FormDataParam("username") String Username, @FormDataParam("password") String Password) {
         System.out.println("students/check");
         try {
             PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Username = ?");
+            System.out.println("username: " + Username);
             check.setString(1, Username);
+            System.out.println("here");
             ResultSet Type = check.executeQuery();
+            System.out.println("after executeQuery()");
             String userType = Type.getString(1);
             if (userType.equals("Adult")) {
                 return AdultsDB.logon(Username, Password);
@@ -86,7 +89,7 @@ import java.util.UUID;
                         userDetails.put("token", token);
                         return userDetails.toString();
 
-                        //return "[\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
+                        //return "{\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
                     } else {
                         return "{\"error\": \"Incorrect password\"}";
                     }
@@ -309,10 +312,8 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
     @Path("register")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-        public String registerStudent(@FormDataParam("StudentUsername")  String StudentUsername,@FormDataParam("StudentName") String StudentName,@FormDataParam("Password")  String Password,@FormDataParam("AdultUsername")  String AdultUsername, @CookieParam("token") String token) {
-        if (!StudentsDB.validToken(token)) {
-            return "{\"error\": \"You don't appear to be logged in.\"}";
-        }
+        public String registerStudent(@FormDataParam("username")  String StudentUsername,@FormDataParam("fullname") String StudentName,@FormDataParam("password")  String Password,@FormDataParam("adultUsername")  String AdultUsername) {
+
             try {
                 if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                     throw new Exception("One or more form data parameters are missing in the HTTP request");
@@ -323,7 +324,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
                     while(results.next()){
                         String username = results.getString(1);
                         if (username.equals(StudentUsername)){
-                            return "[\"Sorry. This username is already taken by an adult\"}";
+                            return "{\"Sorry. This username is already taken by an adult\"}";
                         }
                     }
                 }
@@ -336,11 +337,11 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
 
                 ps.executeUpdate();
 
-                return "[\"status\": \"OK\"}";
+                return "{\"status\": \"OK\"}";
                 //System.out.println("Course added successfully");
             } catch (Exception exception) {
                 System.out.println("Database error" + exception.getMessage());
-                return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+                return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
             }
 
         }
@@ -364,11 +365,11 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
                 ps.setString(4, AdultUsername);
                 ps.setString(5, StudentUsername);
                 ps.executeUpdate();
-                return "[\"status\": \"OK\"}";
+                return "{\"status\": \"OK\"}";
                 //System.out.println("Course added successfully");
             } catch (Exception exception) {
                 System.out.println("Database error" + exception.getMessage());
-                return "[\"error\": \"Unable to update item, please see server console for more info\"}";
+                return "{\"error\": \"Unable to update item, please see server console for more info\"}";
             }
         }
     @POST
@@ -387,11 +388,11 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
                 PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Students WHERE StudentUsername = ?");
                 ps.setString(1, StudentUsername);
                 ps.executeUpdate();
-                return "[\"status\": \"OK\"}";
+                return "{\"status\": \"OK\"}";
                 //System.out.println("Course added successfully");
             } catch (Exception exception) {
                 System.out.println("Database error" + exception.getMessage());
-                return "[\"error\": \"Unable to delete item, please see server console for more info\"}";
+                return "{\"error\": \"Unable to delete item, please see server console for more info\"}";
             }
         }
 

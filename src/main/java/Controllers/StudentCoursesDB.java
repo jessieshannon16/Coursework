@@ -54,11 +54,11 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
             ps.setInt(2, CourseID);
             ps.executeUpdate();
 
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
 
     }
@@ -77,11 +77,11 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
             ps.setInt(2, CourseID);
             ps.setString(3, StudentUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error " + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
     @POST
@@ -97,10 +97,10 @@ System.out.println("Student username: " + StudentUsername + ", Course ID: " + Co
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM StudentCourses WHERE StudentUsername = ?");
             ps.setString(1, StudentUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
 }

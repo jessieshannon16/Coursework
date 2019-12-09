@@ -2,8 +2,39 @@
 <html>
 <head>
     <title>Register</title>
+    <link rel="stylesheet" type="text/css" href="/client/css/registerStyle.css">
+    <script src="/client/js/js.cookie.js"></script>
+    <script src="/client/js/register.js"></script>
+    <link rel="shortcut icon" href="/client/favicon.ico" type="image/x-icon">
 </head>
-<body>
-
+<body onload="pageLoad()">
+<h1>PACOS N' TACOS</h1>
+<form id="registerForm">
+    <div class="registerDiv">
+        <label for="username">Username: </label>
+        <input type="text" name="username" id="username">
+    </div>
+    <div class="registerDiv">
+        <label for="password">Password: </label>
+        <input type="text" name="password" id="password">
+    </div>
+    <div class="registerDiv">
+        <label for="fullname">Full name: </label>
+        <input type="text" name="fullname" id="fullName">
+    </div>
+    <div class="registerDiv">
+        <label for="adultUsername">Adult username: </label>
+        <input type="text" name="adultUsername" id="adultUsername">
+    </div>
+    <div class="registerDiv">
+        <input type="submit" value="Student Account" id="studentButton">
+    </div>
+    <div class="registerDiv">
+        <input type="submit" value="Adult Account" id="adultButton">
+    </div>
+</form>
+<div class="text">
+    If you are making an adult account, don't fill out the last box!
+</div>
 </body>
 </html>

@@ -68,11 +68,11 @@ public class QuestionsDB {
             ps.executeUpdate();
 
 
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
 
     }
@@ -96,10 +96,10 @@ public class QuestionsDB {
             ps.setString(7, IncorrectAnswer3);
             ps.setInt(8, QuestionID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
     @POST
@@ -115,10 +115,10 @@ public class QuestionsDB {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Questions WHERE QuestionID = ?");
             ps.setInt(1, QuestionID);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
         }
     }

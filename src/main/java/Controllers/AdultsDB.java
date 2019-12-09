@@ -153,7 +153,7 @@ public class AdultsDB {
                     userDetails.put("username", AdultUsername);
                     userDetails.put("token", token);
                     return userDetails.toString();
-                   //return "[\"logon successful! Welcome\": \"" + AdultUsername + "\"}";
+                   //return "{\"logon successful! Welcome\": \"" + AdultUsername + "\"}";
                 }else{
                     return "{\"error\": \"Incorrect password\"}";
                 }
@@ -289,7 +289,7 @@ public class AdultsDB {
     @Path("register")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String registerAdult(@FormDataParam("AdultUsername") String AdultUsername,@FormDataParam("AdultName")  String AdultName,@FormDataParam("Password")  String Password, @CookieParam("token") String token) {
+    public static String registerAdult(@FormDataParam("username") String AdultUsername,@FormDataParam("fullname")  String AdultName,@FormDataParam("password")  String Password, @FormDataParam("adultUsername") String adultUsername) {
         /*if (!AdultsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }*/
@@ -305,7 +305,7 @@ public class AdultsDB {
                 while(results.next()){
                     String username = results.getString(1);
                         if (username.equals(AdultUsername)){
-                            return "[\"Sorry. This username is already taken by a student\"}";
+                            return "{\"Sorry. This username is already taken by a student\"}";
                         }
                 }
             }
@@ -315,11 +315,11 @@ public class AdultsDB {
             ps.setString(2, AdultName);
             ps.setString(3, Password);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
 
     }
@@ -342,11 +342,11 @@ public class AdultsDB {
             ps.setString(3, Password);
             ps.setString(4, AdultUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
     @POST
@@ -365,11 +365,11 @@ public class AdultsDB {
             PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Adults WHERE AdultUsername = ?");
             ps.setString(1, AdultUsername);
             ps.executeUpdate();
-            return "[\"status\": \"OK\"}";
+            return "{\"status\": \"OK\"}";
             //System.out.println("Course added successfully");
         } catch (Exception exception) {
             System.out.println("Database error" + exception.getMessage());
-            return "[\"error\": \"Unable to create new item, please see server console for more info\"}";
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
     }
 }
