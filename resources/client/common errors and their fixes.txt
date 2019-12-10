@@ -1,0 +1,1 @@
+ResultSet closed error- make sure the json string names are the same everywhere!

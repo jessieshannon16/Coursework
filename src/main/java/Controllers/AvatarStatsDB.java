@@ -83,12 +83,16 @@ public class AvatarStatsDB {
             PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence FROM AvatarStats WHERE StudentUsername = ?");
             ps.setString(1,StudentUsername);
             ResultSet results = ps.executeQuery();
+            PreparedStatement ps2 = Main.db.prepareStatement("SELECT AvatarImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?)");
+            ps2.setString(1,StudentUsername);
+            ResultSet image = ps2.executeQuery();
 
-            if(results.next()){
+            if(results.next() && image.next()){
                 JSONObject item = new JSONObject();
                 item.put("Hunger", results.getInt(1));
                 item.put("Cleanliness", results.getInt(2));
                 item.put("Intelligence", results.getInt(3));
+                item.put("Image", image.getString(1));
                 list.add(item);
 
                 return list.toString();

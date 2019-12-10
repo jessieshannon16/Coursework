@@ -18,7 +18,7 @@ import java.util.UUID;
     @Path("checkLogon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String checkLogon(@FormDataParam("username") String Username, @FormDataParam("password") String Password) {
+    public static String checkLogon(@FormDataParam("username") String Username, @FormDataParam("password") String Password, @FormDataParam("fullname") String StudentName, @FormDataParam("adultUsername")  String AdultUsername) {
         System.out.println("students/check");
         try {
             PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Username = ?");
@@ -149,6 +149,46 @@ import java.util.UUID;
             System.out.println("Database error during /user/logout: " + exception.getMessage());
             return false;
         }
+    }
+    @POST
+    @Path("register")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public String registerStudent(@FormDataParam("username") String StudentUsername,@FormDataParam("fullname") String StudentName,@FormDataParam("password")  String Password,@FormDataParam("adultUsername")  String AdultUsername) {
+
+        try {
+            if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+            PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT StudentUsername FROm Students");
+            ResultSet results = uniqueCheck.executeQuery();
+            if (results.next()){
+                while(results.next()){
+                    String username = results.getString(1);
+                    if (username.equals(StudentUsername)){
+                        return "{\"Sorry. This username is already taken by an adult\"}";
+                    }
+                }
+            }
+            System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");
+            ps.setString(1, StudentName);
+            ps.setString(2, StudentUsername);
+            ps.setString(3, Password);
+            ps.setString(4, AdultUsername);
+            ps.executeUpdate();
+
+            JSONObject userDetails = new JSONObject();
+            userDetails.put("username", StudentUsername);
+            userDetails.put("password", Password);
+            return userDetails.toString();
+            //return "{\"status\": \"OK\"}";
+            //System.out.println("Course added successfully");
+        } catch (Exception exception) {
+            System.out.println("Database error" + exception.getMessage());
+            return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
+        }
+
     }
     @POST
     @Path("get")
@@ -308,43 +348,7 @@ System.out.println("Username: " + StudentUsername + ", Name: " + StudentName + "
         }
     }
 
-    @POST
-    @Path("register")
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @Produces(MediaType.APPLICATION_JSON)
-        public String registerStudent(@FormDataParam("username")  String StudentUsername,@FormDataParam("fullname") String StudentName,@FormDataParam("password")  String Password,@FormDataParam("adultUsername")  String AdultUsername) {
 
-            try {
-                if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
-                    throw new Exception("One or more form data parameters are missing in the HTTP request");
-                }
-                PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT StudentUsername FROm Students");
-                ResultSet results = uniqueCheck.executeQuery();
-                if (results.next()){
-                    while(results.next()){
-                        String username = results.getString(1);
-                        if (username.equals(StudentUsername)){
-                            return "{\"Sorry. This username is already taken by an adult\"}";
-                        }
-                    }
-                }
-                System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
-                PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");
-                ps.setString(1, StudentName);
-                ps.setString(2, StudentUsername);
-                ps.setString(3, Password);
-                ps.setString(4, AdultUsername);
-
-                ps.executeUpdate();
-
-                return "{\"status\": \"OK\"}";
-                //System.out.println("Course added successfully");
-            } catch (Exception exception) {
-                System.out.println("Database error" + exception.getMessage());
-                return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
-            }
-
-        }
     @POST
     @Path("update")
     @Consumes(MediaType.MULTIPART_FORM_DATA)

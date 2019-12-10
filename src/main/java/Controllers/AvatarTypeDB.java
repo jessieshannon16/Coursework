@@ -15,6 +15,7 @@ public class AvatarTypeDB {
 
     @POST
     @Path("choose")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String choose(@FormDataParam("StudentUsername") String StudentUsername,@FormDataParam("AvatarID") Integer AvatarID ){
         System.out.println("avatartype/choose");
@@ -34,10 +35,44 @@ public class AvatarTypeDB {
             return "{\"error\": \"Unable to update avatar, please see server console for more info.\"}";
         }
     }
+    @POST
+    @Path("images")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String images(@FormDataParam("StudentUsername") String username, @CookieParam("token") String token) {
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
+        System.out.println("avatartyoe/images");
+        try{
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AvatarImage, HungryImage, ConfusedImage, DirtyImage, HCImage, HDImage, DCImage, HCDImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?) ");
+            ps.setString(1, username);
+            ResultSet results = ps.executeQuery();
+            if (results.next()){
+                JSONObject item = new JSONObject();
+                item.put("AvatarImage", results.getString(1));
+                item.put("HungryImage", results.getString(2));
+                item.put("ConfusedImage", results.getString(3));
+                item.put("DirtyImage", results.getString(4));
+                item.put("HCImage", results.getString(5));
+                item.put("HDImage", results.getString(6));
+                item.put("DCImage", results.getString(7));
+                item.put("HDCImage", results.getString(8));
+                return item.toString();
+            }else{
+                return "{\"error\": \"No images for this AvatarID\"}";
+            }
+
+        }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to display avatar images, please see server console for more info.\"}";
 
 
+        }
+    }
     @GET
     @Path("view")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String view(){
         System.out.println("avatartype/view");
@@ -59,6 +94,7 @@ public class AvatarTypeDB {
 
     @GET
     @Path("list")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String selectAvatar(){
         System.out.println("avatartype/list");

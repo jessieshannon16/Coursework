@@ -8,33 +8,45 @@
     <link rel="shortcut icon" href="/client/favicon.ico" type="image/x-icon">
 </head>
 <body onload="pageLoad()">
-<h1>PACOS N' TACOS</h1>
+<div class="title">
+    <form id="login">
+        <div class="loginDiv">
+            <input type="submit" value="Back to login" id="loginButton">
+        </div>
+    </form>
+    <h1>PACOS N' TACOS</h1>
+    <div class="text">
+        If you are making an adult account, don't fill out the last box!
+    </div>
+</div>
+<div class="content">
+<h2> REGISTER </h2>
 <form id="registerForm">
     <div class="registerDiv">
-        <label for="username">Username: </label>
+        <label for="username">Username:</label>
         <input type="text" name="username" id="username">
     </div>
     <div class="registerDiv">
-        <label for="password">Password: </label>
+        <label for="password">Password:</label>
         <input type="text" name="password" id="password">
     </div>
     <div class="registerDiv">
-        <label for="fullname">Full name: </label>
+        <label for="fullname">Full name:</label>
         <input type="text" name="fullname" id="fullName">
     </div>
     <div class="registerDiv">
-        <label for="adultUsername">Adult username: </label>
+        <label for="adultUsername">Adult username:</label>
         <input type="text" name="adultUsername" id="adultUsername">
     </div>
+    <div class="buttons">
     <div class="registerDiv">
         <input type="submit" value="Student Account" id="studentButton">
     </div>
     <div class="registerDiv">
         <input type="submit" value="Adult Account" id="adultButton">
     </div>
+    </div>
 </form>
-<div class="text">
-    If you are making an adult account, don't fill out the last box!
 </div>
 </body>
 </html>

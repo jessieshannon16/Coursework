@@ -1,7 +1,7 @@
 Things to do:
-1. Make sure that once a user registers, they are automatically logged in
-2. Find out why the ResultSet is closed and how to fix it
-3. Change the foreign key set up for the avatarstats table
-4. Resize the images on the login screen
-5. Make the login screen the default screen (probabaly not difficult just type in a separate url?)
+1. Change the foreign key set up for the avatarstats table
+2. Resize the images on the login screen
+3. Make the login screen the default screen (probabaly not difficult just type in a separate url?)
+4. Fix the login screen layout
+
 
