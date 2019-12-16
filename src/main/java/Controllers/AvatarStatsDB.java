@@ -1,26 +1,58 @@
 package Controllers;
 
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import Server.Main;
+        import org.glassfish.jersey.media.multipart.FormDataParam;
+        import Server.Main;
 //import jdk.nashorn.internal.objects.annotations.Getter;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+        import org.glassfish.jersey.media.multipart.FormDataParam;
+        import org.json.simple.JSONArray;
+        import org.json.simple.JSONObject;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import java.awt.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
+        import javax.ws.rs.*;
+        import javax.ws.rs.core.MediaType;
+        import java.awt.*;
+        import java.sql.PreparedStatement;
+        import java.sql.ResultSet;
+        import java.sql.SQLException;
+        import javax.ws.rs.*;
+        import javax.ws.rs.core.MediaType;
 @Path("avatarstats/")
-
 public class AvatarStatsDB {
+    @GET
+    @Path("name")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public static String name(@CookieParam("StudentUsername") String StudentUsername,  @CookieParam("token") String token){
+        System.out.println("avatarstats/name");
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT AvatarName FROM Students WHERE StudentUsername = ?");
+            ps.setString(1, StudentUsername);
+            ResultSet results = ps.executeQuery();
+
+            if (results.next()){
+                JSONObject item = new JSONObject();
+                item.put("AvatarName", results.getString(1));
+                return item.toString();
+            }else{
+                return "{\"error\": \"No username!\"}";
+
+            }
+
+
+        }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to feed avatar, please see server console for more info.\"}";
+            // System.out.println("Error. Something has gone wrong");
+        }
+
+    }
     @POST
     @Path("feed")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+
     public static String feed(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Hunger") Integer Hunger){
         System.out.println("avatarstats/feed");
 
@@ -29,7 +61,7 @@ public class AvatarStatsDB {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE AvatarStats SET Hunger = ? WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET Hunger = ? WHERE StudentUsername = ?");
             ps.setInt(1, Hunger);
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
@@ -43,10 +75,11 @@ public class AvatarStatsDB {
         }
 
     }
-
     @POST
     @Path("clean")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+
     public static String clean(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Cleanliness") Integer Cleanliness){
         System.out.println("avatarstats/clean");
 
@@ -55,7 +88,7 @@ public class AvatarStatsDB {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE AvatarStats SET Cleanliness = ? WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET Cleanliness = ? WHERE StudentUsername = ?");
             ps.setInt(1, Cleanliness);
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
@@ -72,6 +105,7 @@ public class AvatarStatsDB {
     @POST
     @Path("view")
     @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
 
     public static String view(@FormDataParam("StudentUsername") String StudentUsername){
         System.out.println("avatarstats/view");
@@ -80,7 +114,7 @@ public class AvatarStatsDB {
             if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
-            PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence FROM AvatarStats WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence FROM Students WHERE StudentUsername = ?");
             ps.setString(1,StudentUsername);
             ResultSet results = ps.executeQuery();
             PreparedStatement ps2 = Main.db.prepareStatement("SELECT AvatarImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?)");
@@ -108,8 +142,6 @@ public class AvatarStatsDB {
             // System.out.println("Error. Something has gone wrong");
         }
     }
-
-
     @GET
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
@@ -118,7 +150,7 @@ public class AvatarStatsDB {
         System.out.println("avatarstats/list/");
         JSONArray list = new JSONArray();
         try {
-            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, AvatarName, Hunger, Cleanliness, Intelligence FROM AvatarStats");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT StudentUsername, AvatarName, Hunger, Cleanliness, Intelligence FROM Students");
             ResultSet results = ps.executeQuery();
             while (results.next()) {
                 JSONObject item = new JSONObject();
@@ -146,7 +178,7 @@ public class AvatarStatsDB {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("avatarstats/insert StudentUsername=" + StudentUsername + "avatarstats/insert AvatarName=" + AvatarName + "avatarstats/insert Hunger=" + Hunger + "avatarstats/insert Cleanliness=" + Cleanliness + "avatarstats/insert Intelligence=" + Intelligence);
-            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO AvatarStats (StudentUsername, AvatarName, Hunger, Cleanliness, Intelligence) VALUES (?,?,?,?,?)");
+            PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentUsername, AvatarName, Hunger, Cleanliness, Intelligence) VALUES (?,?,?,?,?)");
             ps.setString(1, StudentUsername);
             ps.setString(2, AvatarName);
             ps.setInt(3, Hunger);
@@ -172,7 +204,7 @@ public class AvatarStatsDB {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("avatarstats/update StudentUsernameUpdated=" + StudentUsernameUpdated + "avatarstats/update StudentUsername=" + StudentUsername + "avatarstats/update AvatarName=" + AvatarName + "avatarstats/update Hunger=" + Hunger + "avatarstats/update Cleanliness=" + Cleanliness + "avatarstats/update Intelligence=" + Intelligence);
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE AvatarStats SET StudentUsername = ?, AvatarName = ?, Hunger = ?, Cleanliness = ?, Intelligence = ? WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET StudentUsername = ?, AvatarName = ?, Hunger = ?, Cleanliness = ?, Intelligence = ? WHERE StudentUsername = ?");
             ps.setString(1, StudentUsernameUpdated);
             ps.setString(2, AvatarName);
             ps.setInt(3, Hunger);
@@ -197,7 +229,7 @@ public class AvatarStatsDB {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             System.out.println("avatarstats/delete StudentUsername=" + StudentUsername);
-            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM AvatarStats WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("DELETE FROM Students WHERE StudentUsername = ?");
             ps.setString(1, StudentUsername);
             ps.executeUpdate();
             return "{\"status\": \"OK\"}";
@@ -208,5 +240,3 @@ public class AvatarStatsDB {
         }
     }
 }
-
-

@@ -3,5 +3,9 @@ Things to do:
 2. Resize the images on the login screen
 3. Make the login screen the default screen (probabaly not difficult just type in a separate url?)
 4. Fix the login screen layout
+5. Make sure the user has a place where they can choose what avatar they want
+
+
+Control the avatar page with 2 seperate href pages in order to simplify the problem!!!!
 
 
