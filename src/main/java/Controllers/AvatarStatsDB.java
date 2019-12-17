@@ -21,7 +21,7 @@ public class AvatarStatsDB {
     @Path("name")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    public static String name(@CookieParam("StudentUsername") String StudentUsername,  @CookieParam("token") String token){
+    public static String name(@CookieParam("username") String StudentUsername,  @CookieParam("token") String token){
         System.out.println("avatarstats/name");
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
@@ -37,9 +37,7 @@ public class AvatarStatsDB {
                 return item.toString();
             }else{
                 return "{\"error\": \"No username!\"}";
-
             }
-
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));

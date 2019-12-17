@@ -7,7 +7,39 @@
     <link rel="shortcut icon" href="/client/favicon.ico" type="image/x-icon">
 </head>
 <body onload="pageLoad()">
+<form id="dashboard">
+    <div class="dashboardDiv">
+        <input type="submit" value="Dashboard" id="dashboardButton">
+    </div>
+</form>
+<div id="content">
+    <div class="alpacas">
+        <img src="/client/img/alpaca icon.png" alt="Brown Alpaca" id="BrownAlpaca" width="400px" height="500">
+    </div>
+    <h1>AVATAR NAME</h1>
+    <div>Interact with your avatar!</div>
+    <form id="Interactions">
+    <div class="column">
+        <div class="row">
+            <div id="HungerScore">Hunger: 100</div>
+            <input type="submit" value="FEED!" id="feedButton">
+        </div>
+    </div>
+        <div class="column">
+            <div class="row">
+                <div id="CleanScore">Cleanliness: 100</div>
+                <input type="submit" value="Clean!" id="cleanButton">
+            </div>
+        </div>
+        <div class="column">
+            <div class="row">
+                <div id="LearnScore">Intelligence: 100</div>
+                <input type="submit" value="FEED!" id="learnButton">
+            </div>
+        </div>
+    </form>
 
+</div>
 
 </body>
 </html>

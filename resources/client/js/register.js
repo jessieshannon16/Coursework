@@ -42,7 +42,7 @@ function students(event){
 function adults(event){
     //debugger;
     event.preventDefault()
-    const form = document.getElementById("registerFrom");
+    const form = document.getElementById("registerForm");
     const formData = new FormData(form);
 
     fetch("/adults/register", {method: 'post', body: formData}
