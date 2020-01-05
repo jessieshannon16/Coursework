@@ -17,6 +17,30 @@ package Controllers;
         import javax.ws.rs.core.MediaType;
 @Path("avatarstats/")
 public class AvatarStatsDB {
+
+    @POST
+    @Path("setName")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public static String setName(@CookieParam("token") String token, @FormDataParam("avatarName") String AvatarName, @CookieParam("username") String StudentUsername){
+        System.out.println("avatarstats/setName");
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
+        try{
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET AvatarName = ? WHERE StudentUsername = ?");
+            ps.setString(1, AvatarName);
+            ps.setString(2, StudentUsername);
+            ps.executeUpdate();
+            return "{\"Your avatar name is now updated\"}";
+
+        }catch (Exception exception) {
+        System.out.println("Database error: " + (exception.getMessage()));
+        return "{\"error\": \"Unable to set avatar name\"}";
+        // System.out.println("Error. Something has gone wrong");
+        }
+    }
+
     @GET
     @Path("name")
     @Produces(MediaType.APPLICATION_JSON)

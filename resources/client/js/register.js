@@ -31,7 +31,7 @@ function students(event){
                     Cookies.set("username", responseData.username);
                     Cookies.set("token", responseData.token);
 
-                    window.location.href = '/client/avatar.html';
+                    window.location.href = '/client/avatarnew.html';
 
                 }
             });

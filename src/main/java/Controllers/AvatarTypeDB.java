@@ -17,17 +17,27 @@ public class AvatarTypeDB {
     @Path("choose")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String choose(@FormDataParam("StudentUsername") String StudentUsername,@FormDataParam("AvatarID") Integer AvatarID ){
+    public static String choose(@CookieParam("username") String StudentUsername,@FormDataParam("colour") String AvatarColour, @CookieParam("token") String token){
         System.out.println("avatartype/choose");
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try {
-            if (StudentUsername == null || AvatarID == null){
+            System.out.println("This is the avatar colour: " + AvatarColour);
+            if (AvatarColour == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
+            System.out.println("This is the username: " + StudentUsername);
+            PreparedStatement getID = Main.db.prepareStatement("SELECT AvatarID FROM AvatarType WHERE AvatarColour = ?");
+            getID.setString(1, AvatarColour);
+            ResultSet results = getID.executeQuery();
+            int AvatarID = results.getInt(1);
+            System.out.println("This is the avatar ID: " + AvatarID);
+
             PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET AvatarID = ? WHERE StudentUsername = ?");
             ps.setInt(1, AvatarID);
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
-
             return "{\"Avatar type chosen!\"}";
 
         }catch (Exception exception) {
@@ -43,7 +53,7 @@ public class AvatarTypeDB {
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
-        System.out.println("avatartyoe/images");
+        System.out.println("avatartype/images");
         try{
             PreparedStatement ps = Main.db.prepareStatement("SELECT AvatarImage, HungryImage, ConfusedImage, DirtyImage, HCImage, HDImage, DCImage, HCDImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?) ");
             ps.setString(1, username);
