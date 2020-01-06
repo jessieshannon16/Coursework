@@ -24,11 +24,10 @@ function submit(){
         if (responseData.hasOwnProperty('error')) {
             alert(responseData.error);
         } else {
-
             const form = document.getElementById("nameForm");
             const nameData = new FormData(form);
 
-            fetch("/avatarStats/setName", {method:'post', body: nameData}
+            fetch("/avatarstats/setName", {method:'post', body: nameData}
             ).then(response => response.json()
             ).then(responseData => {
 
@@ -40,9 +39,9 @@ function submit(){
 
                 }
             });
-
         }
     });
+
 
 
 }

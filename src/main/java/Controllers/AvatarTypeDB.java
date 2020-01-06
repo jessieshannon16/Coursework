@@ -19,9 +19,9 @@ public class AvatarTypeDB {
     @Produces(MediaType.APPLICATION_JSON)
     public static String choose(@CookieParam("username") String StudentUsername,@FormDataParam("colour") String AvatarColour, @CookieParam("token") String token){
         System.out.println("avatartype/choose");
-        if (!StudentsDB.validToken(token)) {
+        /*if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
-        }
+        }*/
         try {
             System.out.println("This is the avatar colour: " + AvatarColour);
             if (AvatarColour == null){
@@ -38,7 +38,11 @@ public class AvatarTypeDB {
             ps.setInt(1, AvatarID);
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
-            return "{\"Avatar type chosen!\"}";
+
+            JSONObject response = new JSONObject();
+            response.put("status", "Avatar updated sucessfully!");
+            return response.toString();
+
 
         }catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));

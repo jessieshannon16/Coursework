@@ -32,7 +32,9 @@ public class AvatarStatsDB {
             ps.setString(1, AvatarName);
             ps.setString(2, StudentUsername);
             ps.executeUpdate();
-            return "{\"Your avatar name is now updated\"}";
+            JSONObject response = new JSONObject();
+            response.put("status", "Avatar name updated sucessfully!");
+            return response.toString();
 
         }catch (Exception exception) {
         System.out.println("Database error: " + (exception.getMessage()));
@@ -124,19 +126,19 @@ public class AvatarStatsDB {
         }
 
     }
-    @POST
+    @GET
     @Path("view")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
 
-    public static String view(@FormDataParam("StudentUsername") String StudentUsername){
+    public static String view(@CookieParam("username") String StudentUsername){
         System.out.println("avatarstats/view");
-        JSONArray list = new JSONArray();
+
         try{
             if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
-            PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence FROM Students WHERE StudentUsername = ?");
+            PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence, AvatarName FROM Students WHERE StudentUsername = ?");
             ps.setString(1,StudentUsername);
             ResultSet results = ps.executeQuery();
             PreparedStatement ps2 = Main.db.prepareStatement("SELECT AvatarImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?)");
@@ -148,10 +150,11 @@ public class AvatarStatsDB {
                 item.put("Hunger", results.getInt(1));
                 item.put("Cleanliness", results.getInt(2));
                 item.put("Intelligence", results.getInt(3));
+                item.put("AvatarName", results.getString(4));
                 item.put("Image", image.getString(1));
-                list.add(item);
 
-                return list.toString();
+                return item.toString();
+
             }else{
                 return "{\"error\": \"There are no stats for this username\"}";
 
