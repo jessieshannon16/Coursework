@@ -30,6 +30,7 @@ function students(event){
 
                     Cookies.set("username", responseData.username);
                     Cookies.set("token", responseData.token);
+                    Cookies.set("accountType", responseData.accountType)
 
                     window.location.href = '/client/avatarnew.html';
 
@@ -61,7 +62,7 @@ function adults(event){
 
                     Cookies.set("username", responseData.username);
                     Cookies.set("token", responseData.token);
-
+                    Cookies.set("accountType", responseData.accountType)
                     window.location.href = '/client/index.html';
 
                 }

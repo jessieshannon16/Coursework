@@ -15,6 +15,29 @@ import java.util.UUID;
 @Path("students/")
     public class StudentsDB {
     @POST
+    @Path("type")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @Produces(MediaType.APPLICATION_JSON)
+    public static String type(@CookieParam("username") String username){
+        try{
+            PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Username = ?");
+            check.setString(1, username);
+            ResultSet Type = check.executeQuery();
+            if (Type.next()){
+                JSONObject accountType = new JSONObject();
+                accountType.put("accountType", Type.getString(1));
+                return accountType.toString();
+            }else{
+                return "{\"error\": \"Unable to find account type\"}";
+
+            }
+        } catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to find account type, failed at check, please see server console for more info.\"}";
+
+        }
+    }
+    @POST
     @Path("checkLogon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
@@ -87,6 +110,7 @@ import java.util.UUID;
                         JSONObject userDetails = new JSONObject();
                         userDetails.put("username", StudentUsername);
                         userDetails.put("token", token);
+                        userDetails.put("accountType", "student");
                         return userDetails.toString();
 
                         //return "{\"logon successful! Welcome\": \"" + StudentUsername + "\"}";
@@ -228,12 +252,12 @@ import java.util.UUID;
     @POST
     @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String chooseCourse(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("CourseID") Integer CourseID, @CookieParam("token") String token) {
+    public static String chooseCourse(@CookieParam("username") String StudentUsername, @FormDataParam("CourseID") Integer CourseID, @CookieParam("token") String token) {
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
         try{
-            if (StudentUsername == null || CourseID == null){
+            if (CourseID == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             PreparedStatement ps = Main.db.prepareStatement("SELECT CourseID FROM StudentCourses WHERE StudentUsername = ? ");
@@ -278,7 +302,7 @@ import java.util.UUID;
     @POST
     @Path("courses")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String viewCourses(@FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+    public static String viewCourses(@CookieParam("username") String StudentUsername, @CookieParam("token") String token) {
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
@@ -293,17 +317,17 @@ import java.util.UUID;
             ps.setString(1, StudentUsername);
 
             ResultSet results = ps.executeQuery();
-            if (results.next()) {
+
                 while (results.next()) {
                     JSONObject item = new JSONObject();
-                    item.put("Course Name", results.getString(1));
+                    item.put("CourseName", results.getString(1));
+                    System.out.println(results.getString(1));
                     item.put("Score", results.getInt(2));
                     list.add(item);
                 }
                 return list.toString();
-            }else{
-                return "{\"error\": \"No courses for this Username\"}";
-            }
+
+
         } catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
             return "{\"error\": \"Unable to list courses, please see server console for more info.\"}";

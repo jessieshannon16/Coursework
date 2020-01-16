@@ -18,9 +18,13 @@ public class CoursesDB {
     @Path("list")
     @Produces(MediaType.APPLICATION_JSON)
 
-    public static String selectCourse(){
+    public static String selectCourse(@CookieParam("token") String token){
         System.out.println("courses/list/");
         JSONArray list = new JSONArray();
+        if (!StudentsDB.validToken(token) && !AdultsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+
+        }
         try {
             PreparedStatement ps = Main.db.prepareStatement("SELECT CourseID, CourseName FROM Courses");
             // test pull works

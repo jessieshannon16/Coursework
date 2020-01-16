@@ -46,21 +46,28 @@ function submit(){
 
 }
 function brown(){
-    colour = brown;
+    event.preventDefault();
+
+    colour = "brown";
 }
 function green(){
     event.preventDefault();
-    colour = green;
+
+    colour = "green";
 }
 function pink(){
     event.preventDefault();
-    colour = pink;
+
+    colour = "pink";
 }
 function purple(){
     event.preventDefault();
-    colour = purple;
+    colour = "purple";
 }
 function teal(){
     event.preventDefault();
-    colour = teal;
+
+    colour = "teal";
 }
+
+

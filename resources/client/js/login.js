@@ -33,9 +33,14 @@ function login(event) {
 
             Cookies.set("username", responseData.username);
             Cookies.set("token", responseData.token);
+            Cookies.set("accountType", responseData.accountType);
 
-            window.location.href = '/client/dashboard.html';
+            if (responseData.accountType == "adult")
+                window.location.href = '/client/dashboard.html';
+            else{
+                window.location.href = '/client/avatar.html';
 
+            }
         }
     });
 }

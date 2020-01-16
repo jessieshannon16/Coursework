@@ -16,8 +16,9 @@ import java.util.UUID;
 public class AdultsDB {
     @POST
     @Path("courses")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String courses(@FormDataParam("AdultUsername") String AdultUsername, @CookieParam("token") String token) {
+    public static String courses(@CookieParam("username") String AdultUsername, @CookieParam("token") String token) {
         if (!AdultsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
@@ -32,28 +33,29 @@ public class AdultsDB {
             ps.setString(1, AdultUsername);
             ResultSet results = ps.executeQuery();
 
-            if(!results.next()){
-                return "{\"error\": \"This user has no students\"}";
 
-            }
-            while (results.next()) {
-                String AdultsStudents = results.getString(1);
-                System.out.println(AdultsStudents);
+                while (results.next()) {
+                    String AdultsStudents = results.getString(1);
+                    System.out.println(AdultsStudents);
 
-                PreparedStatement fetch = Main.db.prepareStatement("SELECT Courses.CourseName, StudentCourses.Score FROM Courses INNER JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID WHERE StudentCourses.StudentUsername = ? ");
-                fetch.setString(1, AdultsStudents);
-                ResultSet courses = fetch.executeQuery();
+                    PreparedStatement fetch = Main.db.prepareStatement("SELECT Courses.CourseName, StudentCourses.Score FROM Courses INNER JOIN StudentCourses ON Courses.CourseID = StudentCourses.CourseID WHERE StudentCourses.StudentUsername = ? ");
+                    fetch.setString(1, AdultsStudents);
+                    ResultSet courses = fetch.executeQuery();
 
-                while(courses.next()){
-                    JSONObject item = new JSONObject();
-                    item.put("StudentName", AdultsStudents);
-                    item.put("Course Name", courses.getString(1));
-                    item.put("Score", courses.getInt(2));
-                    list.add(item);
+
+                    while (courses.next()) {
+                        JSONObject item = new JSONObject();
+                        item.put("StudentUsername", AdultsStudents);
+                        System.out.println(AdultsStudents);
+                        item.put("CourseName", courses.getString(1));
+                        System.out.println(courses.getString(1));
+                        item.put("Score", courses.getInt(2));
+                        System.out.println(courses.getInt(2));
+                        list.add(item);
+                    }
+
                 }
-
-            }
-            return list.toString();
+                return list.toString();
 
 
 
@@ -134,6 +136,19 @@ public class AdultsDB {
             if (AdultUsername == null|| Password == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
+            PreparedStatement students = Main.db.prepareStatement("SELECT StudentUsername FROM Students WHERE AdultUsername = ?");
+            students.setString(1, AdultUsername);
+            ResultSet number = students.executeQuery();
+
+            int counter = 0;
+            while (number.next()) {
+                counter = counter + 1;
+            }
+            PreparedStatement update = Main.db.prepareStatement("UPDATE Adults SET NoOfStudents = ? WHERE AdultUsername = ? ");
+            update.setInt(1, counter);
+            update.setString(2, AdultUsername);
+            update.executeUpdate();
+
             PreparedStatement ps = Main.db.prepareStatement("SELECT Password FROM Adults WHERE AdultUsername = ?");
             ps.setString(1, AdultUsername);
             ResultSet results = ps.executeQuery();
@@ -152,6 +167,8 @@ public class AdultsDB {
                     JSONObject userDetails = new JSONObject();
                     userDetails.put("username", AdultUsername);
                     userDetails.put("token", token);
+                    userDetails.put("accountType", "adult");
+
                     return userDetails.toString();
                    //return "{\"logon successful! Welcome\": \"" + AdultUsername + "\"}";
                 }else{
@@ -259,12 +276,12 @@ public class AdultsDB {
     @POST
     @Path("choosecourse")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String chooseCourse(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
+    public static String chooseCourse(@CookieParam("username") String AdultUsername, @FormDataParam("CourseID") Integer CourseID, @FormDataParam("StudentUsername") String StudentUsername, @CookieParam("token") String token) {
         if (!AdultsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
         try {
-            if (StudentUsername == null || CourseID == null || AdultUsername == null) {
+            if (CourseID == null || AdultUsername == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
             PreparedStatement ps1 = Main.db.prepareStatement("SELECT AdultUsername FROM Students WHERE StudentUsername = ?");
