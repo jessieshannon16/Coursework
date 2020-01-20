@@ -9,7 +9,7 @@ function pageLoad() {
     ).then(response => response.json()
     ).then(stats => {
 
-        let imageHTML = `<div>`
+        let imageHTML = `<div>`;
 
         imageHTML +=
             `<img src='/client/img/${stats.Image}' alt='${stats.Image}' id="AlpacaImage" width="400px" height="500">`;

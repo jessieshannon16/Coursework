@@ -1,11 +1,18 @@
 Things to do:
-1. Change the foreign key set up for the avatarstats table
-2. Resize the images on the login screen
-3. Make the login screen the default screen (probabaly not difficult just type in a separate url?)
-4. Fix the login screen layout
-5. Make sure the user has a place where they can choose what avatar they want
+- For learn.html:
+        1.Output all questionId into an array, then use a randomiser to randomly choose a value of i, which will be the id used.
+        2. Return this id to the API, and use it to select the question
+        3. return this to the js
+
+- For feed.html & learn.html:
+        Use images of sponge and taco as buttons (like avatar stats sorta) and onclick triggers a pagereload that increases their avatars score (api's to update scores)
+
+- For dates:
+        1. First check years the same
+        2. Then check months the same, if not subtract current from previous, subtract 1 and multiply that total by 30.5 (finds average no of days)
+        3. subtract current day from previous, if month change, subtract previous from 30.5 and + current
 
 
-Control the avatar page with 2 seperate href pages in order to simplify the problem!!!!
+
 
 
