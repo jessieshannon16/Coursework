@@ -35,6 +35,10 @@ function pageLoad(){
         }
     });
 
+    if (accountType == 'student'){
+        document.getElementById("usernameform").style.display = 'none';
+    }
+
     document.getElementById("logoutButton").addEventListener("click", logout);
     document.getElementById("dashboardButton").addEventListener("click", dashboard);
 

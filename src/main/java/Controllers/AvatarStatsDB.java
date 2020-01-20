@@ -15,6 +15,7 @@ package Controllers;
         import java.sql.SQLException;
         import javax.ws.rs.*;
         import javax.ws.rs.core.MediaType;
+        import java.util.ArrayList;
         import java.util.Random;
 @Path("avatarstats/")
 public class AvatarStatsDB {
@@ -76,19 +77,21 @@ public class AvatarStatsDB {
 
     public static Integer randomQuestion(String username) {
         try {
-            int[] quizArray = {0};
-            int i = 1;
+            //int[] quizArray = {0};
+            ArrayList<Integer> quizArray = new ArrayList<Integer>();
             PreparedStatement ps = Main.db.prepareStatement("SELECT Questions.QuestionID FROM Questions INNER JOIN StudentCourses ON Questions.CourseID = StudentCourses.CourseID WHERE StudentCourses.StudentUsername = ?");
             ps.setString(1, username);
             ResultSet id = ps.executeQuery();
 
             while (id.next()) {
-                quizArray[i] = id.getInt(1);
+                //quizArray[i] = id.getInt(1);
+                quizArray.add(id.getInt(1));
                 System.out.println(id.getInt(1));
-                i++;
             }
             Random rand = new Random();
-            return quizArray[rand.nextInt(quizArray.length - 1)];
+            System.out.println(rand.nextInt(quizArray.size() - 1));
+            int value = rand.nextInt(quizArray.size() - 1);
+            return quizArray.get(value);
 
         } catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
@@ -237,17 +240,39 @@ public class AvatarStatsDB {
             PreparedStatement ps = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence, AvatarName FROM Students WHERE StudentUsername = ?");
             ps.setString(1,StudentUsername);
             ResultSet results = ps.executeQuery();
-            PreparedStatement ps2 = Main.db.prepareStatement("SELECT AvatarImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?)");
+            PreparedStatement ps2 = Main.db.prepareStatement("SELECT AvatarImage, HungryImage, DirtyImage, ConfusedImage, HDImage, HCImage, DCImage, HCDImage FROM AvatarType WHERE AvatarID = (SELECT AvatarID FROM Students WHERE StudentUsername = ?)");
             ps2.setString(1,StudentUsername);
             ResultSet image = ps2.executeQuery();
 
             if(results.next() && image.next()){
                 JSONObject item = new JSONObject();
+
+                int hunger = results.getInt(1);
+                int cleanliness = results.getInt(2);
+                int intelligence = results.getInt(3);
+
+                if (hunger<50 && cleanliness<50 && intelligence<50) {
+                    item.put("Image", image.getString(8));
+                }else if (hunger<50 && cleanliness<50) {
+                    item.put("Image", image.getString(5));
+                }else if(hunger<50 && intelligence<50){
+                    item.put("Image", image.getString(6));
+                }else if(cleanliness<50 && intelligence<50){
+                    item.put("Image", image.getString(7));
+                }else if (cleanliness<50){
+                    item.put("Image", image.getString(3));
+                }else if(hunger<50){
+                    item.put("Image", image.getString(2));
+                }else if (intelligence<50){
+                    item.put("Image", image.getString(4));
+                }else{
+                    item.put("Image", image.getString(1));
+                }
+
                 item.put("Hunger", results.getInt(1));
                 item.put("Cleanliness", results.getInt(2));
                 item.put("Intelligence", results.getInt(3));
                 item.put("AvatarName", results.getString(4));
-                item.put("Image", image.getString(1));
 
                 return item.toString();
 

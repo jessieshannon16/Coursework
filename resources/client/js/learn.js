@@ -22,9 +22,9 @@ function pageLoad(){
 
         questionHTML +=
             `<button id='Answer1Button' >${question.CorrectAnswer}</button></div>` +
-            `<button id='Answer2Button' >${question.InorrectAnswer1}</button></div>` +
-            `<button id='Answer3Button' >${question.InorrectAnswer2}</button></div>` +
-            `<button id='Answer4Button' >${question.InorrectAnswer3}</button></div>` ;
+            `<button id='Answer2Button' >${question.IncorrectAnswer1}</button></div>` +
+            `<button id='Answer3Button' >${question.IncorrectAnswer2}</button></div>` +
+            `<button id='Answer4Button' >${question.IncorrectAnswer3}</button></div>` ;
 
         questionHTML += `</div>`;
         document.getElementById("questions").innerHTML = questionHTML;

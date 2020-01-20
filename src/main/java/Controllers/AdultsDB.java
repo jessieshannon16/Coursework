@@ -281,9 +281,10 @@ public class AdultsDB {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
         try {
-            if (CourseID == null || AdultUsername == null) {
+            if (CourseID == null || AdultUsername == null || StudentUsername == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
+
             PreparedStatement ps1 = Main.db.prepareStatement("SELECT AdultUsername FROM Students WHERE StudentUsername = ?");
             ps1.setString(1, StudentUsername);
             ResultSet results = ps1.executeQuery();

@@ -251,6 +251,7 @@ import java.util.UUID;
     }
     @POST
     @Path("choosecourse")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
     public static String chooseCourse(@CookieParam("username") String StudentUsername, @FormDataParam("CourseID") Integer CourseID, @CookieParam("token") String token) {
         if (!StudentsDB.validToken(token)) {
@@ -260,43 +261,17 @@ import java.util.UUID;
             if (CourseID == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
-            PreparedStatement ps = Main.db.prepareStatement("SELECT CourseID FROM StudentCourses WHERE StudentUsername = ? ");
-            ps.setString(1, StudentUsername);
-            ResultSet results = ps.executeQuery();
-            if (results.next()){
-                while (results.next());{
-                    // stores the outputs in a variable
-                    Integer takenCourseID = results.getInt(1);
-                    if (CourseID.equals(takenCourseID)) {
-                        //Id the CourseID is already stored as a course the student takes, the program throws an error
-                        return "{\"error\": \"You are already taking this course!\"}";
-                    } else {
-                        //If the CourseID can't be found within the table, the course is added as a students course
-                        PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
-                        ps2.setString(1, StudentUsername);
-                        ps2.setInt(2, CourseID);
-                        ps2.executeUpdate();
-                        return "{\"Success\": \"You are now taking this course!\"}";
-                    }
-                }
-            }else {//if the student hasn't currently got any courses, the username needs to first be validated and then it can be added
-                PreparedStatement check = Main.db.prepareStatement("SELECT * FROM Students WHERE StudentUsername = ?");
-                check.setString(1, StudentUsername);
-                ResultSet checkresult = check.executeQuery();
-                if (checkresult.next()) {
-                PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
-                ps2.setString(1, StudentUsername);
-                ps2.setInt(2, CourseID);
-                ps2.executeUpdate();
-                return "{\"Success\": \"You are now taking this course!\"}";
-                } else {
-                    return "{\"error\": \"StudentUsername is not recognised\"}";
 
-                }
-            }
+                    //If the CourseID can't be found within the table, the course is added as a students course
+                    PreparedStatement ps2 = Main.db.prepareStatement("INSERT INTO  StudentCourses(StudentUsername, CourseID) VALUES (?,?)");
+                    ps2.setString(1, StudentUsername);
+                    ps2.setInt(2, CourseID);
+                    ps2.executeUpdate();
+                    return "{\"Success\": \"You are now taking this course!\"}";
+
         }catch (Exception exception){
         System.out.println("Database error: " + (exception.getMessage()));
-        return "{\"error\": \"Unable to add the course, please see server console for more info.\"}";
+        return "{\"error\": \"You're already taking this course!\"}";
         }
     }
     @POST
