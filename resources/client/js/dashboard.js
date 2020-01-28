@@ -66,7 +66,7 @@ function pageLoad() {
         ).then(response => response.json()
         ).then(image => {
 
-            document.getElementById("image").innerHTML = `<div><img src='/client/img/${image.Image}' alt='${image.Image}' id="AlpacaImage" width="400px" height="500"></div>div>`;
+            document.getElementById("image").innerHTML = `<div><img src='/client/img/${image.Image}' alt='${image.Image}' id="AlpacaImage" width="400px" height="500"></div>`;
 
         });
     }

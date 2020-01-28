@@ -99,7 +99,7 @@ public class AvatarStatsDB {
         }
     }
 
-    @GET
+    @POST
     @Path("question")
     @Produces(MediaType.APPLICATION_JSON)
     public static String question(@CookieParam("token") String token, @CookieParam("username") String username, @FormDataParam("questionID")Integer QuestionID) {
@@ -211,6 +211,7 @@ public class AvatarStatsDB {
             PreparedStatement update = Main.db.prepareStatement("UPDATE Students SET Intelligence = ? WHERE StudentUsername = ?");
             update.setInt(1,newScore);
             update.setString(2, StudentUsername);
+            update.executeUpdate();
 
             return "{\"success!\":\"Your avatar is now less dumb!\"}";
 

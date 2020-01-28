@@ -1,4 +1,7 @@
-
+let now = new Date();
+let day = now.getDate();
+let month = now.getMonth() + 1;
+let year = now.getFullYear();
 
 function pageLoad(){
     document.getElementById("studentButton").addEventListener("click", students);
@@ -11,6 +14,9 @@ function students(event){
     event.preventDefault()
     const form = document.getElementById("registerForm");
     const formData = new FormData(form);
+    formData.append("day", day);
+    formData.append("month", month);
+    formData.append("year", year);
 
     fetch("/students/register", {method: 'post', body: formData}
     ).then(response => response.json()
@@ -30,7 +36,7 @@ function students(event){
 
                     Cookies.set("username", responseData.username);
                     Cookies.set("token", responseData.token);
-                    Cookies.set("accountType", responseData.accountType)
+                    Cookies.set("accountType", responseData.accountType);
 
                     window.location.href = '/client/avatarnew.html';
 
@@ -45,6 +51,9 @@ function adults(event){
     event.preventDefault()
     const form = document.getElementById("registerForm");
     const formData = new FormData(form);
+    formData.append("day", day);
+    formData.append("month", month);
+    formData.append("year", year);
 
     fetch("/adults/register", {method: 'post', body: formData}
     ).then(response => response.json()

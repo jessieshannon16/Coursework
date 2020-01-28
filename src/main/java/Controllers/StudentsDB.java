@@ -52,7 +52,7 @@ import java.util.UUID;
             System.out.println("after executeQuery()");
             String userType = Type.getString(1);
             if (userType.equals("Adult")) {
-                return AdultsDB.logon(Username, Password, day, month, year);
+                return AdultsDB.logon(Username, Password);
             } else {
                 return StudentsDB.logon(Username, Password, day, month, year);
             }
@@ -121,7 +121,7 @@ import java.util.UUID;
                         return "{\"error\": \"Incorrect password\"}";
                     }
                 } else {
-                    AdultsDB.logon(StudentUsername, Password, day, month, year);
+                    AdultsDB.logon(StudentUsername, Password);
                     return "{\"error\": \"Unknown user\"}";
                 }
 
@@ -141,6 +141,9 @@ import java.util.UUID;
             int oldYear = results.getInt(3);
 
             int score = 0;
+            int hunger = 0;
+            int clever = 0;
+            int dirty = 0;
 
             if (oldYear != year){
                 score = score + ((year - oldYear - 1)*356);
@@ -159,6 +162,45 @@ import java.util.UUID;
                     score = score + (day - oldDay);
                 }
             }
+            if (score != 0){
+                hunger = 5 * score;
+                clever = 5 * score;
+                dirty = 5 * score;
+            }
+
+
+            PreparedStatement select = Main.db.prepareStatement("SELECT Hunger, Cleanliness, Intelligence FROM Students WHERE StudentUsername = ?");
+            select.setString(1,username);
+            ResultSet stats = select.executeQuery();
+
+            System.out.println(stats.getInt(1));
+            System.out.println(stats.getInt(2));
+            System.out.println(stats.getInt(3));
+
+
+            hunger = stats.getInt(1) - hunger;
+            clever = stats.getInt(2) - clever;
+            dirty = stats.getInt(3) - dirty;
+            if (hunger < 0){
+                hunger = 0;
+            }
+            if (clever < 0){
+                clever = 0;
+            }
+            if (dirty < 0){
+                dirty = 0;
+            }
+            PreparedStatement update = Main.db.prepareStatement("UPDATE Students SET Hunger = ?, Cleanliness = ?, Intelligence = ?, LastDay = ?, LastMonth = ?, LastYear = ? WHERE StudentUsername = ?");
+            update.setInt(1, hunger);
+            update.setInt(2,clever);
+            update.setInt(3,dirty);
+            update.setInt(4,day);
+            update.setInt(5,month);
+            update.setInt(6,year);
+            update.setString(7, username);
+            update.executeUpdate();
+
+
             return 1;
 
         }catch (Exception exception) {
@@ -219,7 +261,7 @@ import java.util.UUID;
     @Path("register")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public String registerStudent(@FormDataParam("username") String StudentUsername,@FormDataParam("fullname") String StudentName,@FormDataParam("password")  String Password,@FormDataParam("adultUsername")  String AdultUsername) {
+    public String registerStudent(@FormDataParam("username") String StudentUsername,@FormDataParam("fullname") String StudentName,@FormDataParam("password")  String Password,@FormDataParam("adultUsername")  String AdultUsername,@FormDataParam("day")  Integer day,@FormDataParam("month")  Integer month,@FormDataParam("year")  Integer year) {
 
         try {
             if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
@@ -231,17 +273,22 @@ import java.util.UUID;
                 while(results.next()){
                     String username = results.getString(1);
                     if (username.equals(StudentUsername)){
-                        return "{\"Sorry. This username is already taken by an adult\"}";
+                        return "{\"error\": \"Sorry. This username is already taken by an adult\"}";
+
                     }
                 }
             }
-            System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
+            //System.out.println("students/insert StudentName=" + StudentName + "students/insert StudentUsername=" + StudentUsername + "students/insert Password=" + Password + "students/insert AdultUsername=" + AdultUsername);
             PreparedStatement ps = Main.db.prepareStatement("INSERT INTO Students (StudentName, StudentUsername, Password, AdultUsername) VALUES (?,?,?,?)");
             ps.setString(1, StudentName);
             ps.setString(2, StudentUsername);
             ps.setString(3, Password);
             ps.setString(4, AdultUsername);
             ps.executeUpdate();
+
+            if (StudentsDB.setDate(day,month,year,AdultUsername)==0){
+                return "{\"error\": \"Error with setting date\"}";
+            }
 
             JSONObject userDetails = new JSONObject();
             userDetails.put("username", StudentUsername);
@@ -253,6 +300,27 @@ import java.util.UUID;
             System.out.println("Database error" + exception.getMessage());
             return "{\"error\": \"Unable to create new item, please see server console for more info\"}";
         }
+
+    }
+    public static int setDate(Integer day, Integer month, Integer year, String username){
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET Hunger = ?, Cleanliness = ?, Intelligence = ?, LastDay = ?, LastMonth = ?, LastYear = ? WHERE StudentUsername = ?");
+            ps.setInt(1,100);
+            ps.setInt(2,100);
+            ps.setInt(3,100);
+            ps.setInt(4, day);
+            ps.setInt(5,month);
+            ps.setInt(6,year);
+            ps.setString(7,username);
+            ps.executeUpdate();
+            return 1;
+
+        }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return 0;
+
+        }
+
 
     }
     @POST
