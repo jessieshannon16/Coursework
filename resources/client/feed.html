@@ -1,13 +1,27 @@
 <!DOCTYPE html>
 <head>
-<title>Feed!</title>
-<link rel="stylesheet" type="text/css" href="/client/css/avatarStyle.css">
-<script src="/client/js/js.cookie.js"></script>
-<script src="/client/js/feed.js"></script>
-<link rel="shortcut icon" href="/client/favicon.ico" type="image/x-icon">
+    <title>Feed!</title>
+    <link rel="stylesheet" type="text/css" href="/client/css/avatarStyle.css">
+    <script src="/client/js/js.cookie.js"></script>
+    <script src="/client/js/feed.js"></script>
+    <link rel="shortcut icon" href="/client/favicon.ico" type="image/x-icon">
 </head>
 <body onload="pageLoad()">
-
+<form id="avatarStats">
+    <div class="avatarDiv">
+        <input type="submit" value="Avatar Stats" id="avatarButton">
+    </div>
+</form>
+<h1>BATH TIME!</h1>
+<p id="instructions">Click the taco to feed your avatar</p>
+<p id="message">Make sure to feed your avatar everyday so they don't become hungry!</p>
+<div id="avatar"></div>
+<form id="taco">
+    <div class="image">
+        <input type="image" name="tacoButton" src="/client/img/taco icon.png" alt="taco" id="tacoButton">
+    </div>
+</form>
+<div id="stats"></div>
 
 </body>
 </html>

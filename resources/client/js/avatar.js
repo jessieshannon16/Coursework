@@ -42,7 +42,7 @@ function pageLoad() {
 
 }
 function feed(event){
-event.preventDefault()
+    event.preventDefault()
     window.location.href = '/client/feed.html';
 
 }

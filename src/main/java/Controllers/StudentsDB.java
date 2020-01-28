@@ -41,7 +41,7 @@ import java.util.UUID;
     @Path("checkLogon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String checkLogon(@FormDataParam("username") String Username, @FormDataParam("password") String Password, @FormDataParam("fullname") String StudentName, @FormDataParam("adultUsername")  String AdultUsername) {
+    public static String checkLogon(@FormDataParam("username") String Username, @FormDataParam("password") String Password, @FormDataParam("fullname") String StudentName, @FormDataParam("adultUsername")  String AdultUsername, @FormDataParam("month") Integer month, @FormDataParam("day") Integer day, @FormDataParam("year") Integer year) {
         System.out.println("students/check");
         try {
             PreparedStatement check = Main.db.prepareStatement("SELECT UserType FROM AllUsers WHERE Username = ?");
@@ -52,9 +52,9 @@ import java.util.UUID;
             System.out.println("after executeQuery()");
             String userType = Type.getString(1);
             if (userType.equals("Adult")) {
-                return AdultsDB.logon(Username, Password);
+                return AdultsDB.logon(Username, Password, day, month, year);
             } else {
-                return StudentsDB.logon(Username, Password);
+                return StudentsDB.logon(Username, Password, day, month, year);
             }
         } catch (Exception exception) {
             System.out.println("Database error: " + (exception.getMessage()));
@@ -88,7 +88,7 @@ import java.util.UUID;
     @Path("logon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String logon(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Password") String Password){
+    public static String logon(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Password") String Password, @FormDataParam("month") Integer month, @FormDataParam("day") Integer day, @FormDataParam("year") Integer year){
         System.out.println("students/logon");
         try{
 
@@ -101,6 +101,9 @@ import java.util.UUID;
                     String correctPassword = results.getString(1);
                     if (Password.equals(correctPassword)) {
                         String token = UUID.randomUUID().toString();
+                        if(StudentsDB.updateDate(day, month, year, StudentUsername)==0){
+                            return "{\"error\": \"Error adding dates\"}";
+                        }
 
                         PreparedStatement ps2 = Main.db.prepareStatement("UPDATE Students SET Token = ? WHERE StudentUsername = ?");
                         ps2.setString(1, token);
@@ -118,7 +121,7 @@ import java.util.UUID;
                         return "{\"error\": \"Incorrect password\"}";
                     }
                 } else {
-                    AdultsDB.logon(StudentUsername, Password);
+                    AdultsDB.logon(StudentUsername, Password, day, month, year);
                     return "{\"error\": \"Unknown user\"}";
                 }
 
@@ -126,6 +129,44 @@ import java.util.UUID;
             System.out.println("Database error: " + (exception.getMessage()));
             return "{\"error\": \"Unable to logon, please see server console for more info.\"}";
         }
+    }
+    public static Integer updateDate(Integer day, Integer month, Integer year, String username){
+        try {
+            PreparedStatement ps = Main.db.prepareStatement("SELECT LastDay, LastMonth, LastYear FROM Students WHERE StudentUsername =?");
+            ps.setString(1,username);
+            ResultSet results = ps.executeQuery();
+
+            int oldDay = results.getInt(1);
+            int oldMonth = results.getInt(2);
+            int oldYear = results.getInt(3);
+
+            int score = 0;
+
+            if (oldYear != year){
+                score = score + ((year - oldYear - 1)*356);
+            }
+            if (oldMonth!= month){
+                if (oldMonth > month){
+                    score = score + ((12- oldMonth + month - 1)*30);
+                }else{
+                    score = score + ((month - oldMonth - 1)*30);
+                }
+            }
+            if (oldDay != day){
+                if (oldDay > day){
+                    score = score + (30- oldDay + day);
+                }else{
+                    score = score + (day - oldDay);
+                }
+            }
+            return 1;
+
+        }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return 0;
+
+        }
+
     }
     @POST
     @Path("logout")
@@ -184,7 +225,7 @@ import java.util.UUID;
             if (StudentName == null || StudentUsername == null || Password == null || AdultUsername == null) {
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
-            PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT StudentUsername FROm Students");
+            PreparedStatement uniqueCheck = Main.db.prepareStatement("SELECT StudentUsername FROM Students");
             ResultSet results = uniqueCheck.executeQuery();
             if (results.next()){
                 while(results.next()){

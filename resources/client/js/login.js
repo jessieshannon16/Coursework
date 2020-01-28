@@ -1,3 +1,7 @@
+let now = new Date();
+let day = now.getDate();
+let month = now.getMonth() + 1;
+let year = now.getFullYear();
 function pageLoad() {
     if(window.location.search === '?logout') {
         document.getElementById('content').innerHTML = '<h1>Logging out, please wait...</h1>';
@@ -6,7 +10,7 @@ function pageLoad() {
         document.getElementById("loginButton").addEventListener("click", login);
         document.getElementById("registerButton").addEventListener("click", register)
     }
-
+    console.log(day + " " + month + " " + year);
 }
 function register(event){
     event.preventDefault()
@@ -21,6 +25,10 @@ function login(event) {
 
     const form = document.getElementById("loginForm");
     const formData = new FormData(form);
+    formData.append("day", day);
+    formData.append("month", month);
+    formData.append("year", year);
+
 
     fetch("/students/checkLogon", {method: 'post', body: formData}
     ).then(response => response.json()

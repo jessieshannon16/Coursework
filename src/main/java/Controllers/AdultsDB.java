@@ -130,7 +130,7 @@ public class AdultsDB {
     @Path("logon")
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @Produces(MediaType.APPLICATION_JSON)
-    public static String logon(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("Password") String Password){
+    public static String logon(@FormDataParam("AdultUsername") String AdultUsername, @FormDataParam("Password") String Password, @FormDataParam("month") Integer month, @FormDataParam("day") Integer day, @FormDataParam("year") Integer year){
         System.out.println("adults/logon");
         try{
             if (AdultUsername == null|| Password == null){

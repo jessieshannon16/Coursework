@@ -86,11 +86,11 @@ public class AvatarStatsDB {
             while (id.next()) {
                 //quizArray[i] = id.getInt(1);
                 quizArray.add(id.getInt(1));
-                System.out.println(id.getInt(1));
+                //System.out.println(id.getInt(1));
             }
             Random rand = new Random();
-            System.out.println(rand.nextInt(quizArray.size() - 1));
-            int value = rand.nextInt(quizArray.size() - 1);
+            //System.out.println(rand.nextInt(quizArray.size() - 1));
+            int value = rand.nextInt(quizArray.size());
             return quizArray.get(value);
 
         } catch (Exception exception) {
@@ -102,23 +102,34 @@ public class AvatarStatsDB {
     @GET
     @Path("question")
     @Produces(MediaType.APPLICATION_JSON)
-    public static String question(@CookieParam("token") String token, @CookieParam("username") String username) {
+    public static String question(@CookieParam("token") String token, @CookieParam("username") String username, @FormDataParam("questionID")Integer QuestionID) {
         if (!StudentsDB.validToken(token)) {
             return "{\"error\": \"You don't appear to be logged in.\"}";
         }
+        int questionId;
+
         try {
-            int questionId = randomQuestion(username);
-            if (questionId == 0){
-                return "{\"error\": \"You don't appear to have any courses.\"}";
-            }
+            do {
+                questionId = randomQuestion(username);
+                if (questionId == 0) {
+                    return "{\"error\": \"You don't appear to have any courses.\"}";
+                }
+            }while (questionId == QuestionID);
 
             PreparedStatement question = Main.db.prepareStatement("SELECT * FROM Questions WHERE QuestionID = ?");
             question.setInt(1,questionId);
             ResultSet questions = question.executeQuery();
 
-            if (questions.next()) {
+            int courseID = questions.getInt(2);
+
+            PreparedStatement name = Main.db.prepareStatement("SELECT CourseName FROM Courses WHERE CourseID = ?");
+            name.setInt(1,courseID);
+            ResultSet courseId = name.executeQuery();
+
+            if (questions.next() && courseId.next()) {
 
                 JSONObject item = new JSONObject();
+                item.put("CourseName", courseId.getString(1));
                 item.put("QuestionID", questions.getInt(1));
                 item.put("CourseID", questions.getInt(2));
                 item.put("Question", questions.getString(3));
@@ -128,7 +139,7 @@ public class AvatarStatsDB {
                 item.put("IncorrectAnswer3", questions.getString(7));
 
                 return item.toString();
-                            }
+            }
             return "{\"error\": \"There is no questions attached to this id\"}";
 
         } catch (Exception exception) {
@@ -138,6 +149,42 @@ public class AvatarStatsDB {
         }
     }
 
+    @POST
+    @Path("score")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    public static String score(@CookieParam("token")String token,@CookieParam("username") String StudentUsername, @FormDataParam("CourseID") Integer CourseID){
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
+        try {
+            if (CourseID == null){
+                throw new Exception("One or more form data parameters are missing in the HTTP request");
+            }
+
+            PreparedStatement select = Main.db.prepareStatement("SELECT Score FROM StudentCourses WHERE StudentUsername = ? AND CourseID = ?");
+            select.setString(1, StudentUsername);
+            select.setInt(2, CourseID);
+            ResultSet score = select.executeQuery();
+            int newScore = score.getInt(1) + 1;
+
+
+            PreparedStatement update = Main.db.prepareStatement("UPDATE StudentCourses SET Score = ? WHERE StudentUsername = ? AND CourseID = ?");
+            update.setInt(1,newScore);
+            update.setString(2, StudentUsername);
+            update.setInt(3, CourseID);
+            update.executeUpdate();
+
+
+            return "{\"success!\":\"Score updated!\"}";
+
+        }catch (Exception exception) {
+            System.out.println("Database error: " + (exception.getMessage()));
+            return "{\"error\": \"Unable to update score, please see server console for more info.\"}";
+            // System.out.println("Error. Something has gone wrong");
+        }
+
+    }
     @POST
     @Path("learn")
     @Produces(MediaType.APPLICATION_JSON)
@@ -156,7 +203,10 @@ public class AvatarStatsDB {
             PreparedStatement select = Main.db.prepareStatement("SELECT Intelligence FROM Students WHERE StudentUsername = ?");
             select.setString(1, StudentUsername);
             ResultSet intelligent = select.executeQuery();
-            int newScore = intelligent.getInt(1) + intelligence;
+            int newScore = intelligent.getInt(1) + (10*intelligence);
+            if(newScore >100){
+                newScore = 100;
+            }
 
             PreparedStatement update = Main.db.prepareStatement("UPDATE Students SET Intelligence = ? WHERE StudentUsername = ?");
             update.setInt(1,newScore);
@@ -171,23 +221,32 @@ public class AvatarStatsDB {
         }
 
     }
-    @POST
+    @GET
     @Path("feed")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-
-    public static String feed(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Hunger") Integer Hunger){
+    public static String feed(@CookieParam("token") String token, @CookieParam("username") String StudentUsername){
         System.out.println("avatarstats/feed");
-
+        if (!StudentsDB.validToken(token)) {
+            return "{\"error\": \"You don't appear to be logged in.\"}";
+        }
         try {
-            if (StudentUsername == null || Hunger == null){
+            if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET Hunger = ? WHERE StudentUsername = ?");
-            ps.setInt(1, Hunger);
-            ps.setString(2, StudentUsername);
-            ps.executeUpdate();
+            PreparedStatement select = Main.db.prepareStatement("SELECT Hunger FROM Students WHERE StudentUsername = ?");
+            select.setString(1, StudentUsername);
+            ResultSet hunger = select.executeQuery();
+            int newScore = hunger.getInt(1) + 10;
+            if(newScore >100){
+                newScore = 100;
+            }
+
+            PreparedStatement update = Main.db.prepareStatement("UPDATE Students SET Hunger = ? WHERE StudentUsername = ?");
+            update.setInt(1,newScore);
+            update.setString(2, StudentUsername);
+            update.executeUpdate();
 
             return "{\"success!\":\"Your avatar is now less hungry!\"}";
 
@@ -198,23 +257,31 @@ public class AvatarStatsDB {
         }
 
     }
-    @POST
+    @GET
     @Path("clean")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
 
-    public static String clean(@FormDataParam("StudentUsername") String StudentUsername, @FormDataParam("Cleanliness") Integer Cleanliness){
+    public static String clean(@CookieParam("username") String StudentUsername, @CookieParam("token")String token){
         System.out.println("avatarstats/clean");
 
         try {
-            if (StudentUsername == null || Cleanliness == null){
+            if (StudentUsername == null){
                 throw new Exception("One or more form data parameters are missing in the HTTP request");
             }
 
-            PreparedStatement ps = Main.db.prepareStatement("UPDATE Students SET Cleanliness = ? WHERE StudentUsername = ?");
-            ps.setInt(1, Cleanliness);
-            ps.setString(2, StudentUsername);
-            ps.executeUpdate();
+            PreparedStatement select = Main.db.prepareStatement("SELECT Cleanliness FROM Students WHERE StudentUsername = ?");
+            select.setString(1, StudentUsername);
+            ResultSet cleanliness = select.executeQuery();
+            int newScore = cleanliness.getInt(1) + 10;
+            if(newScore >100){
+                newScore = 100;
+            }
+
+            PreparedStatement update = Main.db.prepareStatement("UPDATE Students SET Cleanliness = ? WHERE StudentUsername = ?");
+            update.setInt(1,newScore);
+            update.setString(2, StudentUsername);
+            update.executeUpdate();
 
             return "{\"success!\":\"Your avatar is now cleaner!\"}";
 
@@ -251,19 +318,19 @@ public class AvatarStatsDB {
                 int cleanliness = results.getInt(2);
                 int intelligence = results.getInt(3);
 
-                if (hunger<50 && cleanliness<50 && intelligence<50) {
+                if (hunger<80 && cleanliness<80 && intelligence<80) {
                     item.put("Image", image.getString(8));
-                }else if (hunger<50 && cleanliness<50) {
+                }else if (hunger<80 && cleanliness<80) {
                     item.put("Image", image.getString(5));
-                }else if(hunger<50 && intelligence<50){
+                }else if(hunger<80 && intelligence<80){
                     item.put("Image", image.getString(6));
-                }else if(cleanliness<50 && intelligence<50){
+                }else if(cleanliness<80 && intelligence<80){
                     item.put("Image", image.getString(7));
-                }else if (cleanliness<50){
+                }else if (cleanliness<80){
                     item.put("Image", image.getString(3));
-                }else if(hunger<50){
+                }else if(hunger<80){
                     item.put("Image", image.getString(2));
-                }else if (intelligence<50){
+                }else if (intelligence<80){
                     item.put("Image", image.getString(4));
                 }else{
                     item.put("Image", image.getString(1));
